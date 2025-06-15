@@ -7,159 +7,131 @@
   <link rel="icon" type="image/png" href="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #07818c;
+      --secondary-color: #555;
+      --border-color: #e0e0e0;
+      --bg-color: #f8f9fa;
+      --highlight-color: #f1f9fa;
+    }
+    
     body {
       font-family: 'Poppins', sans-serif;
-      background: #f8f9fa;
-      padding: 0;
-      margin: 0;
+      background: var(--bg-color);
       color: #333;
       line-height: 1.6;
+      margin: 0;
+      padding: 0;
     }
+    
     .container {
       max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
+      margin: 30px auto;
       background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+      border-radius: 8px;
+      overflow: hidden;
     }
+    
     .header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #e0e0e0;
+      text-align: center;
+      padding: 25px 20px;
+      background: white;
     }
-    .logo {
-      height: 50px;
-      margin-right: 15px;
-    }
-    .company-name {
-      font-size: 22px;
-      font-weight: 600;
-      color: #07818c;
+    
+    .company-logo {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary-color);
       margin: 0;
+      line-height: 1.2;
     }
-    .status-container {
-      margin-bottom: 25px;
-    }
-    .status-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-    .ref-no {
+    
+    .company-subtitle {
       font-size: 16px;
-      font-weight: 500;
-      color: #555;
-      margin-top: 5px;
+      color: var(--secondary-color);
+      margin: 5px 0 0;
+      font-weight: 400;
     }
-    .status-badge {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: 500;
-      font-size: 14px;
-      background: #cce5ff;
-      color: #004085;
+    
+    .section {
+      padding: 0 30px;
+      margin: 25px 0;
     }
-    .status-process {
-      background: #cce5ff;
-      color: #004085;
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
     }
-    .status-open {
-      background: #fff3cd;
-      color: #856404;
+    
+    .ref-no {
+      font-size: 15px;
+      color: var(--secondary-color);
+      margin-bottom: 10px;
     }
-    .status-resolved {
-      background: #d4edda;
-      color: #155724;
-    }
-    .waiting-list {
-      background: #f8f9fa;
-      padding: 12px;
+    
+    .status-message {
+      background: var(--highlight-color);
+      padding: 15px;
       border-radius: 6px;
-      margin-top: 10px;
-      font-size: 14px;
-      border-left: 4px solid #07818c;
+      border-left: 4px solid var(--primary-color);
+      margin: 15px 0;
+      font-size: 15px;
     }
+    
     .details-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      margin: 20px 0;
     }
+    
+    .details-table th {
+      text-align: left;
+      padding: 12px 15px;
+      font-weight: 500;
+      color: var(--secondary-color);
+      width: 35%;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
     .details-table td {
       padding: 12px 15px;
-      border-bottom: 1px solid #e9ecef;
+      border-bottom: 1px solid var(--border-color);
     }
-    .field-name {
-      font-weight: 500;
-      width: 30%;
-      background: #f8fafc;
-    }
-    .field-name-text {
-      position: relative;
-      padding-left: 12px;
-    }
-    .field-name-text:before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 6px;
-      height: 16px;
-      width: 4px;
-      background: #07818c;
-      border-radius: 2px;
-    }
+    
     .footer {
       text-align: center;
+      padding: 20px;
       margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #e0e0e0;
-      color: #666;
+      border-top: 1px solid var(--border-color);
+      color: var(--secondary-color);
       font-size: 14px;
     }
-    h2 {
-      color: #07818c;
-      margin: 0;
-    }
-    h3 {
-      color: #07818c;
-      margin: 20px 0 10px;
-    }
-    .loading {
-      text-align: center;
-      padding: 20px;
-      color: #666;
-    }
+    
     @media (max-width: 600px) {
       .container {
-        padding: 15px;
-        margin: 10px;
+        margin: 15px;
+        border-radius: 0;
       }
-      .header {
-        flex-direction: column;
-        text-align: center;
+      
+      .section {
+        padding: 0 20px;
       }
-      .logo {
-        margin: 0 0 10px 0;
-      }
-      .status-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      
+      .details-table th,
       .details-table td {
+        padding: 10px;
         display: block;
         width: 100%;
-        padding: 10px;
+        border-bottom: none;
       }
-      .field-name {
-        background: none;
-        padding-bottom: 5px;
+      
+      .details-table tr {
+        border-bottom: 1px solid var(--border-color);
       }
     }
   </style>
@@ -167,163 +139,56 @@
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png" alt="Kan Universal Logo" class="logo">
-      <h1 class="company-name">Kan Universal Pvt Ltd</h1>
+      <h1 class="company-logo">KAN UNIVERSAL</h1>
+      <p class="company-subtitle">Kan Universal Pvt Ltd</p>
     </div>
     
-    <div class="status-container">
-      <div class="status-header">
-        <div>
-          <h2>Complaint Status</h2>
-          <div class="ref-no" id="refNo">REF-0001</div>
-        </div>
-        <div class="status-badge status-process" id="statusBadge">In Process</div>
-      </div>
-      
-      <div class="waiting-list" id="statusMessage">
-        We have scheduled engineer SURYA to your complaint.
-      </div>
+    <div class="section">
+      <h2 class="section-title">Complaint Status</h2>
+      <div class="ref-no" id="refNo"></div>
+      <div class="status-message" id="statusMessage"></div>
     </div>
     
-    <h3>Complaint Details</h3>
-    <table class="details-table" id="complaintDetails">
-      <tr>
-        <td class="field-name"><span class="field-name-text">Timestamp</span></td>
-        <td class="field-value">11 Jun 2025, 11:52 AM</td>
-      </tr>
-      <!-- More rows will be added dynamically -->
-    </table>
+    <div class="section">
+      <h2 class="section-title">Complaint Details</h2>
+      <table class="details-table" id="complaintDetails">
+        <!-- Data will be inserted here by JavaScript -->
+      </table>
+    </div>
     
     <div class="footer">
-      <p>© <span id="currentYear">2025</span> Kan Universal Pvt Ltd. All rights reserved.</p>
-      <p>For any queries, please contact our customer support.</p>
+      <p>© <span id="currentYear"></span> Kan Universal Pvt Ltd. All rights reserved.</p>
+      <p>For any queries, please contact our customer support</p>
     </div>
   </div>
 
   <script>
-    // Safe DOM element access function
-    function getElement(id) {
-      const element = document.getElementById(id);
-      if (!element) {
-        console.error(`Element with ID '${id}' not found`);
-        return null;
-      }
-      return element;
-    }
-
-    // Wait for DOM to be fully loaded
+    // DOM Ready Handler
     document.addEventListener('DOMContentLoaded', function() {
-      // Set current year in footer
-      const currentYearEl = getElement('currentYear');
-      if (currentYearEl) {
-        currentYearEl.textContent = new Date().getFullYear();
-      }
-
+      // Set current year
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
+      
       // Get tracking ID from URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const trackingId = urlParams.get('id');
-
+      const trackingId = new URLSearchParams(window.location.search).get('id');
+      
       if (trackingId) {
-        fetchComplaintData(trackingId);
+        loadComplaintData(trackingId);
       } else {
-        showError("No tracking ID provided. Please use the complete tracking link.");
+        showError("No tracking ID provided");
       }
     });
 
-    async function fetchComplaintData(trackingId) {
-      try {
-        // Show loading state
-        const loadingData = getElement('loadingData');
-        const complaintDetails = getElement('complaintDetails');
-        
-        if (loadingData) loadingData.style.display = 'block';
-        if (complaintDetails) complaintDetails.style.display = 'none';
-
-        // Use JSONP approach
-        const scriptUrl = `https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}&callback=handleResponse`;
-        
-        // Create script element for JSONP
-        const script = document.createElement('script');
-        script.src = scriptUrl;
-        document.body.appendChild(script);
-        
-        // Set timeout for failed requests (10 seconds)
-        setTimeout(() => {
-          if (!window.responseReceived) {
-            showError("Request timed out. Please try again.");
-          }
-        }, 10000);
-        
-      } catch (error) {
-        console.error('Error loading complaint data:', error);
-        showError("Failed to load complaint details. Please try again later.");
-      }
-    }
-
-    // Global flag to track response
-    window.responseReceived = false;
-    
-    // Handle JSONP response
-    window.handleResponse = function(data) {
-      window.responseReceived = true;
-      
-      try {
-        if (data.error) {
-          showError(data.message);
-          return;
-        }
-
-        // Update status information
-        updateElementText('statusBadge', data.status);
-        updateElementText('refNo', data.refNo);
-        updateElementText('statusMessage', data.statusMessage);
-        
-        // Update status badge class
-        const statusBadge = getElement('statusBadge');
-        if (statusBadge) {
-          statusBadge.className = `status-badge ${data.statusClass || 'status-process'}`;
-        }
-
-        // Build complaint details table
-        const detailsTable = getElement('complaintDetails');
-        if (detailsTable && data.details) {
-          detailsTable.innerHTML = '';
-          
-          Object.entries(data.details).forEach(([fieldName, fieldValue]) => {
-            if (fieldValue) {
-              const row = document.createElement('tr');
-              row.innerHTML = `
-                <td class="field-name"><span class="field-name-text">${fieldName}</span></td>
-                <td class="field-value">${fieldValue}</td>
-              `;
-              detailsTable.appendChild(row);
-            }
-          });
-          
-          detailsTable.style.display = 'table';
-        }
-        
-      } catch (error) {
-        console.error('Error processing response:', error);
-        showError("Error displaying complaint details.");
-      }
-    };
-
-    // Helper function to safely update element text
-    function updateElementText(id, text) {
-      const element = getElement(id);
-      if (element) element.textContent = text;
+    function loadComplaintData(trackingId) {
+      // JSONP implementation would go here
+      // This is just a styling template - keep your existing data loading logic
     }
 
     function showError(message) {
-      const loadingDiv = getElement('loadingData');
-      if (loadingDiv) {
-        loadingDiv.innerHTML = `
-          <div style="color: #dc3545; padding: 15px; background: #f8d7da; border-radius: 4px; margin: 20px 0;">
-            <p><strong>Error:</strong> ${message}</p>
-            <p>Please try again or contact support with your reference number.</p>
-          </div>
-        `;
+      const statusContainer = document.querySelector('.status-message');
+      if (statusContainer) {
+        statusContainer.style.backgroundColor = '#f8d7da';
+        statusContainer.style.borderLeftColor = '#dc3545';
+        statusContainer.textContent = message;
       }
     }
   </script>
