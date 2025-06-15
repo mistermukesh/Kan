@@ -7,7 +7,161 @@
   <link rel="icon" type="image/png" href="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    /* Your existing CSS styles here */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f8f9fa;
+      padding: 0;
+      margin: 0;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .logo {
+      height: 50px;
+      margin-right: 15px;
+    }
+    .company-name {
+      font-size: 22px;
+      font-weight: 600;
+      color: #07818c;
+      margin: 0;
+    }
+    .status-container {
+      margin-bottom: 25px;
+    }
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .ref-no {
+      font-size: 16px;
+      font-weight: 500;
+      color: #555;
+      margin-top: 5px;
+    }
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 14px;
+      background: #cce5ff;
+      color: #004085;
+    }
+    .status-process {
+      background: #cce5ff;
+      color: #004085;
+    }
+    .status-open {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .status-resolved {
+      background: #d4edda;
+      color: #155724;
+    }
+    .waiting-list {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-size: 14px;
+      border-left: 4px solid #07818c;
+    }
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .details-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .field-name {
+      font-weight: 500;
+      width: 30%;
+      background: #f8fafc;
+    }
+    .field-name-text {
+      position: relative;
+      padding-left: 12px;
+    }
+    .field-name-text:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      height: 16px;
+      width: 4px;
+      background: #07818c;
+      border-radius: 2px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+      color: #666;
+      font-size: 14px;
+    }
+    h2 {
+      color: #07818c;
+      margin: 0;
+    }
+    h3 {
+      color: #07818c;
+      margin: 20px 0 10px;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+        margin: 10px;
+      }
+      .header {
+        flex-direction: column;
+        text-align: center;
+      }
+      .logo {
+        margin: 0 0 10px 0;
+      }
+      .status-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .details-table td {
+        display: block;
+        width: 100%;
+        padding: 10px;
+      }
+      .field-name {
+        background: none;
+        padding-bottom: 5px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -21,26 +175,27 @@
       <div class="status-header">
         <div>
           <h2>Complaint Status</h2>
-          <div class="ref-no" id="refNo">Loading reference...</div>
+          <div class="ref-no" id="refNo">REF-0001</div>
         </div>
-        <div class="status-badge" id="statusBadge">Loading...</div>
+        <div class="status-badge status-process" id="statusBadge">In Process</div>
       </div>
       
       <div class="waiting-list" id="statusMessage">
-        Loading status information...
+        We have scheduled engineer SURYA to your complaint.
       </div>
     </div>
     
-    <h3 style="margin: 25px 0 15px; color: #07818c;">Complaint Details</h3>
-    <div id="loadingData" class="loading">
-      <p>Loading complaint details...</p>
-    </div>
-    <table class="details-table" id="complaintDetails" style="display: none;">
-      <!-- Data will be inserted here -->
+    <h3>Complaint Details</h3>
+    <table class="details-table" id="complaintDetails">
+      <tr>
+        <td class="field-name"><span class="field-name-text">Timestamp</span></td>
+        <td class="field-value">11 Jun 2025, 11:52 AM</td>
+      </tr>
+      <!-- More rows will be added dynamically -->
     </table>
     
     <div class="footer">
-      <p>© <span id="currentYear"></span> Kan Universal Pvt Ltd. All rights reserved.</p>
+      <p>© <span id="currentYear">2025</span> Kan Universal Pvt Ltd. All rights reserved.</p>
       <p>For any queries, please contact our customer support.</p>
     </div>
   </div>
@@ -58,7 +213,7 @@
 
     // Wait for DOM to be fully loaded
     document.addEventListener('DOMContentLoaded', function() {
-      // Safely set current year
+      // Set current year in footer
       const currentYearEl = getElement('currentYear');
       if (currentYearEl) {
         currentYearEl.textContent = new Date().getFullYear();
@@ -145,7 +300,6 @@
             }
           });
           
-          getElement('loadingData').style.display = 'none';
           detailsTable.style.display = 'table';
         }
         
@@ -170,11 +324,6 @@
             <p>Please try again or contact support with your reference number.</p>
           </div>
         `;
-      }
-      
-      const detailsTable = getElement('complaintDetails');
-      if (detailsTable) {
-        detailsTable.style.display = 'none';
       }
     }
   </script>
