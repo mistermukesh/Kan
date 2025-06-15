@@ -12,93 +12,153 @@
 </head>
 <body>
   <div class="container">
-    <!-- (Keep all your existing HTML structure here) -->
-  </div>
-<script>
-  // Set current year in footer
-  document.getElementById('currentYear').textContent = new Date().getFullYear();
-
-  // Get tracking ID from URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const trackingId = urlParams.get('id');
-
-  async function fetchComplaintData() {
-    if (!trackingId) {
-      showError("No tracking ID provided in URL. Please use the complete tracking link you received.");
-      return;
-    }
-
-    try {
-      // Show loading state
-      document.getElementById('loadingData').style.display = 'block';
-      document.getElementById('complaintDetails').style.display = 'none';
-
-      // Use JSONP approach to bypass CORS
-      const scriptUrl = `https://script.google.com/macros/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}&callback=handleResponse`;
-      
-      // Create a script element to load the data
-      const script = document.createElement('script');
-      script.src = scriptUrl;
-      document.body.appendChild(script);
-      
-    } catch (error) {
-      console.error('Error loading complaint data:', error);
-      showError("Failed to load complaint details. Please try again later or contact support.");
-    }
-  }
-
-  // This function will be called by the JSONP response
-  window.handleResponse = function(data) {
-    try {
-      // Update status information
-      document.getElementById('statusBadge').className = `status-badge status-${data.status.toLowerCase()}`;
-      document.getElementById('statusBadge').textContent = data.status;
-      document.getElementById('refNo').textContent = data.refNo;
-      document.getElementById('statusMessage').textContent = data.statusMessage;
-
-      // Build complaint details table
-      const detailsTable = document.getElementById('complaintDetails');
-      detailsTable.innerHTML = '';
-      
-      Object.entries(data.details).forEach(([fieldName, fieldValue]) => {
-        if (fieldValue) {
-          const newRow = document.createElement('tr');
-          
-          const nameCell = document.createElement('td');
-          nameCell.className = 'field-name';
-          nameCell.innerHTML = `<span class="field-name-text">${fieldName}</span>`;
-          
-          const valueCell = document.createElement('td');
-          valueCell.className = 'field-value';
-          valueCell.textContent = fieldValue;
-          
-          newRow.appendChild(nameCell);
-          newRow.appendChild(valueCell);
-          detailsTable.appendChild(newRow);
-        }
-      });
-      
-      document.getElementById('loadingData').style.display = 'none';
-      detailsTable.style.display = 'table';
-      
-    } catch (error) {
-      console.error('Error processing response:', error);
-      showError("Error displaying complaint details. Please contact support.");
-    }
-  };
-
-  function showError(message) {
-    document.getElementById('loadingData').innerHTML = `
-      <div style="color: #dc3545; padding: 15px; background: #f8d7da; border-radius: 4px; margin: 20px 0;">
-        <p><strong>Error:</strong> ${message}</p>
-        <p>Please try again or contact our support team with your reference number.</p>
+    <div class="header">
+      <img src="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png" alt="Kan Universal Logo" class="logo">
+      <h1 class="company-name">Kan Universal Pvt Ltd</h1>
+    </div>
+    
+    <div class="status-container">
+      <div class="status-header">
+        <div>
+          <h2>Complaint Status</h2>
+          <div class="ref-no" id="refNo">Loading reference...</div>
+        </div>
+        <div class="status-badge" id="statusBadge">Loading...</div>
       </div>
-    `;
-    document.getElementById('complaintDetails').style.display = 'none';
-  }
+      
+      <div class="waiting-list" id="statusMessage">
+        Loading status information...
+      </div>
+    </div>
+    
+    <h3 style="margin: 25px 0 15px; color: #07818c;">Complaint Details</h3>
+    <div id="loadingData" class="loading">
+      <p>Loading complaint details...</p>
+    </div>
+    <table class="details-table" id="complaintDetails" style="display: none;">
+      <!-- Data will be inserted here by JavaScript -->
+    </table>
+    
+    <div class="footer">
+      <p>© <span id="currentYear"></span> Kan Universal Pvt Ltd. All rights reserved.</p>
+      <p>For any queries, please contact our customer support.</p>
+    </div>
+  </div>
 
-  // Initialize when page loads
-  document.addEventListener('DOMContentLoaded', fetchComplaintData);
-</script>
+  <script>
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set current year in footer
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+      // Get tracking ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const trackingId = urlParams.get('id');
+
+      // Fetch complaint data
+      if (trackingId) {
+        fetchComplaintData(trackingId);
+      } else {
+        showError("No tracking ID provided in URL. Please use the complete tracking link you received.");
+      }
+    });
+
+    async function fetchComplaintData(trackingId) {
+      try {
+        // Show loading state
+        document.getElementById('loadingData').style.display = 'block';
+        document.getElementById('complaintDetails').style.display = 'none';
+
+        // Use JSONP approach
+        const scriptUrl = `https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}&callback=handleResponse`;
+        
+        // Create script element for JSONP
+        const script = document.createElement('script');
+        script.src = scriptUrl;
+        document.body.appendChild(script);
+        
+        // Set timeout for failed requests
+        setTimeout(() => {
+          if (!window.responseReceived) {
+            showError("Request timed out. Please try again later.");
+          }
+        }, 10000);
+        
+      } catch (error) {
+        console.error('Error loading complaint data:', error);
+        showError("Failed to load complaint details. Please try again later.");
+      }
+    }
+
+    // Global flag to track response
+    window.responseReceived = false;
+    
+    // Handle JSONP response
+    window.handleResponse = function(data) {
+      window.responseReceived = true;
+      
+      try {
+        if (data.error) {
+          showError(data.message);
+          return;
+        }
+
+        // Update status information
+        const statusBadge = document.getElementById('statusBadge');
+        const refNo = document.getElementById('refNo');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        if (statusBadge && refNo && statusMessage) {
+          statusBadge.className = `status-badge ${data.statusClass}`;
+          statusBadge.textContent = data.status;
+          refNo.textContent = data.refNo;
+          statusMessage.textContent = data.statusMessage;
+        }
+
+        // Build complaint details table
+        const detailsTable = document.getElementById('complaintDetails');
+        if (detailsTable) {
+          detailsTable.innerHTML = '';
+          
+          if (data.details) {
+            Object.entries(data.details).forEach(([fieldName, fieldValue]) => {
+              if (fieldValue) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                  <td class="field-name"><span class="field-name-text">${fieldName}</span></td>
+                  <td class="field-value">${fieldValue}</td>
+                `;
+                detailsTable.appendChild(row);
+              }
+            });
+          }
+          
+          document.getElementById('loadingData').style.display = 'none';
+          detailsTable.style.display = 'table';
+        }
+        
+      } catch (error) {
+        console.error('Error processing response:', error);
+        showError("Error displaying complaint details.");
+      }
+    };
+
+    function showError(message) {
+      const loadingDiv = document.getElementById('loadingData');
+      if (loadingDiv) {
+        loadingDiv.innerHTML = `
+          <div style="color: #dc3545; padding: 15px; background: #f8d7da; border-radius: 4px; margin: 20px 0;">
+            <p><strong>Error:</strong> ${message}</p>
+            <p>Please try again or contact our support team.</p>
+          </div>
+        `;
+      }
+      
+      const detailsTable = document.getElementById('complaintDetails');
+      if (detailsTable) {
+        detailsTable.style.display = 'none';
+      }
+    }
+  </script>
 </body>
 </html>
