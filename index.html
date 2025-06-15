@@ -64,14 +64,33 @@
       font-weight: 600;
       color: var(--primary-color);
       margin-bottom: 15px;
-      padding-bottom: 8px;
+    }
+    
+    .status-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
       border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+    
+    .status-header .section-title {
+      margin-bottom: 0;
     }
     
     .ref-no {
       font-size: 15px;
       color: var(--secondary-color);
-      margin-bottom: 10px;
+      position: relative;
+      padding-left: 15px;
+    }
+    
+    .ref-no::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--primary-color);
     }
     
     .status-message {
@@ -122,6 +141,25 @@
         padding: 0 20px;
       }
       
+      .status-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+      
+      .ref-no::before {
+        content: "";
+      }
+      
+      .ref-no {
+        padding-left: 0;
+      }
+      
+      .ref-no::before {
+        content: "→ ";
+        position: static;
+      }
+      
       .details-table th,
       .details-table td {
         padding: 10px;
@@ -144,8 +182,10 @@
     </div>
     
     <div class="section">
-      <h2 class="section-title">Complaint Status</h2>
-      <div class="ref-no" id="refNo"></div>
+      <div class="status-header">
+        <h2 class="section-title">Complaint Status</h2>
+        <div class="ref-no" id="refNo"></div>
+      </div>
       <div class="status-message" id="statusMessage"></div>
     </div>
     
@@ -163,7 +203,6 @@
   </div>
 
   <script>
-    // DOM Ready Handler
     document.addEventListener('DOMContentLoaded', function() {
       // Set current year
       document.getElementById('currentYear').textContent = new Date().getFullYear();
@@ -179,9 +218,64 @@
     });
 
     function loadComplaintData(trackingId) {
-      // JSONP implementation would go here
-      // This is just a styling template - keep your existing data loading logic.
+      // JSONP implementation
+      const scriptUrl = `https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}&callback=handleResponse`;
+      
+      const script = document.createElement('script');
+      script.src = scriptUrl;
+      document.body.appendChild(script);
+      
+      setTimeout(() => {
+        if (!window.responseReceived) {
+          showError("Request timed out. Please try again.");
+        }
+      }, 10000);
     }
+
+    window.responseReceived = false;
+    
+    window.handleResponse = function(data) {
+      window.responseReceived = true;
+      
+      try {
+        if (data.error) {
+          showError(data.message);
+          return;
+        }
+
+        // Update status information with arrow separator
+        const refNoElement = document.getElementById('refNo');
+        if (refNoElement) {
+          refNoElement.textContent = data.refNo;
+        }
+        
+        const statusMessage = document.getElementById('statusMessage');
+        if (statusMessage) {
+          statusMessage.textContent = data.statusMessage;
+        }
+
+        // Build complaint details table
+        const detailsTable = document.getElementById('complaintDetails');
+        if (detailsTable && data.details) {
+          detailsTable.innerHTML = '';
+          
+          Object.entries(data.details).forEach(([fieldName, fieldValue]) => {
+            if (fieldValue) {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <th>${fieldName}</th>
+                <td>${fieldValue}</td>
+              `;
+              detailsTable.appendChild(row);
+            }
+          });
+        }
+        
+      } catch (error) {
+        console.error('Error processing response:', error);
+        showError("Error displaying complaint details.");
+      }
+    };
 
     function showError(message) {
       const statusContainer = document.querySelector('.status-message');
