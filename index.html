@@ -14,132 +14,91 @@
   <div class="container">
     <!-- (Keep all your existing HTML structure here) -->
   </div>
+<script>
+  // Set current year in footer
+  document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-  <script>
-    // Set current year in footer
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
+  // Get tracking ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const trackingId = urlParams.get('id');
 
-    // Get tracking ID from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const trackingId = urlParams.get('id');
-
-    // List of columns to exclude from display
-    const excludedColumns = [
-      "Url", "Amount Received", "Customer Feedback", 
-      "Tracking ID", "Tracking URL", "Email address",
-      "Mobile Number", "Organization Type", "Problems Types",
-      "LED Problem", "Assigned Engineer1", "Assigned Engineer2"
-    ];
-
-    // Format date for display
-    function formatDate(dateString) {
-      if (!dateString) return '';
-      const date = new Date(dateString);
-      return isNaN(date.getTime()) ? dateString : date.toLocaleString('en-IN', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+  async function fetchComplaintData() {
+    if (!trackingId) {
+      showError("No tracking ID provided in URL. Please use the complete tracking link you received.");
+      return;
     }
 
-    // Fetch complaint data from Google Apps Script
-    async function fetchComplaintData() {
-      if (!trackingId) {
-        showError("No tracking ID provided in URL. Please use the complete tracking link you received.");
-        return;
-      }
-
-      try {
-        // Show loading state
-        document.getElementById('loadingData').style.display = 'block';
-        document.getElementById('complaintDetails').style.display = 'none';
-
-        // Use your Google Apps Script URL (Web App)
-        const scriptUrl = `https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}`;
-        
-        // First fetch to get the HTML
-        const response = await fetch(scriptUrl);
-        const html = await response.text();
-        
-        // Create a temporary DOM parser to extract data
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        
-        // Extract status information
-        const statusBadge = doc.querySelector('.status-badge');
-        const refNoElement = doc.querySelector('.ref-no');
-        const statusMessage = doc.querySelector('.waiting-list');
-        
-        if (statusBadge && refNoElement && statusMessage) {
-          document.getElementById('statusBadge').className = statusBadge.className;
-          document.getElementById('statusBadge').textContent = statusBadge.textContent.trim();
-          document.getElementById('refNo').textContent = refNoElement.textContent.replace('Reference:', '').trim();
-          document.getElementById('statusMessage').innerHTML = statusMessage.innerHTML;
-        }
-        
-        // Extract and display complaint details
-        const tableRows = doc.querySelectorAll('.details-table tr');
-        const detailsTable = document.getElementById('complaintDetails');
-        detailsTable.innerHTML = '';
-        
-        let hasData = false;
-        tableRows.forEach(row => {
-          const cells = row.querySelectorAll('td');
-          if (cells.length === 2) {
-            const fieldName = cells[0].textContent.trim();
-            let fieldValue = cells[1].textContent.trim();
-            
-            // Format date fields
-            if (['Timestamp', 'Record Time1', 'Record Time2'].includes(fieldName)) {
-              fieldValue = formatDate(fieldValue);
-            }
-            
-            if (fieldValue && !excludedColumns.includes(fieldName)) {
-              hasData = true;
-              const newRow = document.createElement('tr');
-              
-              const nameCell = document.createElement('td');
-              nameCell.className = 'field-name';
-              nameCell.innerHTML = `<span class="field-name-text">${fieldName}</span>`;
-              
-              const valueCell = document.createElement('td');
-              valueCell.className = 'field-value';
-              valueCell.textContent = fieldValue;
-              
-              newRow.appendChild(nameCell);
-              newRow.appendChild(valueCell);
-              detailsTable.appendChild(newRow);
-            }
-          }
-        });
-        
-        document.getElementById('loadingData').style.display = 'none';
-        detailsTable.style.display = hasData ? 'table' : 'none';
-        
-        if (!hasData) {
-          showError("No complaint data found for this tracking ID");
-        }
-        
-      } catch (error) {
-        console.error('Error loading complaint data:', error);
-        showError("Failed to load complaint details. Please try again later or contact support.");
-      }
-    }
-
-    function showError(message) {
-      document.getElementById('loadingData').innerHTML = `
-        <div style="color: #dc3545; padding: 15px; background: #f8d7da; border-radius: 4px; margin: 20px 0;">
-          <p><strong>Error:</strong> ${message}</p>
-          <p>If you believe this is incorrect, please contact our support team with your reference number.</p>
-        </div>
-      `;
+    try {
+      // Show loading state
+      document.getElementById('loadingData').style.display = 'block';
       document.getElementById('complaintDetails').style.display = 'none';
-    }
 
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', fetchComplaintData);
-  </script>
+      // Use JSONP approach to bypass CORS
+      const scriptUrl = `https://script.google.com/macros/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}&callback=handleResponse`;
+      
+      // Create a script element to load the data
+      const script = document.createElement('script');
+      script.src = scriptUrl;
+      document.body.appendChild(script);
+      
+    } catch (error) {
+      console.error('Error loading complaint data:', error);
+      showError("Failed to load complaint details. Please try again later or contact support.");
+    }
+  }
+
+  // This function will be called by the JSONP response
+  window.handleResponse = function(data) {
+    try {
+      // Update status information
+      document.getElementById('statusBadge').className = `status-badge status-${data.status.toLowerCase()}`;
+      document.getElementById('statusBadge').textContent = data.status;
+      document.getElementById('refNo').textContent = data.refNo;
+      document.getElementById('statusMessage').textContent = data.statusMessage;
+
+      // Build complaint details table
+      const detailsTable = document.getElementById('complaintDetails');
+      detailsTable.innerHTML = '';
+      
+      Object.entries(data.details).forEach(([fieldName, fieldValue]) => {
+        if (fieldValue) {
+          const newRow = document.createElement('tr');
+          
+          const nameCell = document.createElement('td');
+          nameCell.className = 'field-name';
+          nameCell.innerHTML = `<span class="field-name-text">${fieldName}</span>`;
+          
+          const valueCell = document.createElement('td');
+          valueCell.className = 'field-value';
+          valueCell.textContent = fieldValue;
+          
+          newRow.appendChild(nameCell);
+          newRow.appendChild(valueCell);
+          detailsTable.appendChild(newRow);
+        }
+      });
+      
+      document.getElementById('loadingData').style.display = 'none';
+      detailsTable.style.display = 'table';
+      
+    } catch (error) {
+      console.error('Error processing response:', error);
+      showError("Error displaying complaint details. Please contact support.");
+    }
+  };
+
+  function showError(message) {
+    document.getElementById('loadingData').innerHTML = `
+      <div style="color: #dc3545; padding: 15px; background: #f8d7da; border-radius: 4px; margin: 20px 0;">
+        <p><strong>Error:</strong> ${message}</p>
+        <p>Please try again or contact our support team with your reference number.</p>
+      </div>
+    `;
+    document.getElementById('complaintDetails').style.display = 'none';
+  }
+
+  // Initialize when page loads
+  document.addEventListener('DOMContentLoaded', fetchComplaintData);
+</script>
 </body>
 </html>
