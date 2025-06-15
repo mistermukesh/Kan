@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    /* (Keep all your existing CSS styles here) */
+    /* Your existing CSS styles here */
   </style>
 </head>
 <body>
@@ -36,7 +36,7 @@
       <p>Loading complaint details...</p>
     </div>
     <table class="details-table" id="complaintDetails" style="display: none;">
-      <!-- Data will be inserted here by JavaScript -->
+      <!-- Data will be inserted here -->
     </table>
     
     <div class="footer">
@@ -46,28 +46,43 @@
   </div>
 
   <script>
+    // Safe DOM element access function
+    function getElement(id) {
+      const element = document.getElementById(id);
+      if (!element) {
+        console.error(`Element with ID '${id}' not found`);
+        return null;
+      }
+      return element;
+    }
+
     // Wait for DOM to be fully loaded
     document.addEventListener('DOMContentLoaded', function() {
-      // Set current year in footer
-      document.getElementById('currentYear').textContent = new Date().getFullYear();
+      // Safely set current year
+      const currentYearEl = getElement('currentYear');
+      if (currentYearEl) {
+        currentYearEl.textContent = new Date().getFullYear();
+      }
 
       // Get tracking ID from URL
       const urlParams = new URLSearchParams(window.location.search);
       const trackingId = urlParams.get('id');
 
-      // Fetch complaint data
       if (trackingId) {
         fetchComplaintData(trackingId);
       } else {
-        showError("No tracking ID provided in URL. Please use the complete tracking link you received.");
+        showError("No tracking ID provided. Please use the complete tracking link.");
       }
     });
 
     async function fetchComplaintData(trackingId) {
       try {
         // Show loading state
-        document.getElementById('loadingData').style.display = 'block';
-        document.getElementById('complaintDetails').style.display = 'none';
+        const loadingData = getElement('loadingData');
+        const complaintDetails = getElement('complaintDetails');
+        
+        if (loadingData) loadingData.style.display = 'block';
+        if (complaintDetails) complaintDetails.style.display = 'none';
 
         // Use JSONP approach
         const scriptUrl = `https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}&callback=handleResponse`;
@@ -77,10 +92,10 @@
         script.src = scriptUrl;
         document.body.appendChild(script);
         
-        // Set timeout for failed requests
+        // Set timeout for failed requests (10 seconds)
         setTimeout(() => {
           if (!window.responseReceived) {
-            showError("Request timed out. Please try again later.");
+            showError("Request timed out. Please try again.");
           }
         }, 10000);
         
@@ -104,36 +119,33 @@
         }
 
         // Update status information
-        const statusBadge = document.getElementById('statusBadge');
-        const refNo = document.getElementById('refNo');
-        const statusMessage = document.getElementById('statusMessage');
+        updateElementText('statusBadge', data.status);
+        updateElementText('refNo', data.refNo);
+        updateElementText('statusMessage', data.statusMessage);
         
-        if (statusBadge && refNo && statusMessage) {
-          statusBadge.className = `status-badge ${data.statusClass}`;
-          statusBadge.textContent = data.status;
-          refNo.textContent = data.refNo;
-          statusMessage.textContent = data.statusMessage;
+        // Update status badge class
+        const statusBadge = getElement('statusBadge');
+        if (statusBadge) {
+          statusBadge.className = `status-badge ${data.statusClass || 'status-process'}`;
         }
 
         // Build complaint details table
-        const detailsTable = document.getElementById('complaintDetails');
-        if (detailsTable) {
+        const detailsTable = getElement('complaintDetails');
+        if (detailsTable && data.details) {
           detailsTable.innerHTML = '';
           
-          if (data.details) {
-            Object.entries(data.details).forEach(([fieldName, fieldValue]) => {
-              if (fieldValue) {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                  <td class="field-name"><span class="field-name-text">${fieldName}</span></td>
-                  <td class="field-value">${fieldValue}</td>
-                `;
-                detailsTable.appendChild(row);
-              }
-            });
-          }
+          Object.entries(data.details).forEach(([fieldName, fieldValue]) => {
+            if (fieldValue) {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td class="field-name"><span class="field-name-text">${fieldName}</span></td>
+                <td class="field-value">${fieldValue}</td>
+              `;
+              detailsTable.appendChild(row);
+            }
+          });
           
-          document.getElementById('loadingData').style.display = 'none';
+          getElement('loadingData').style.display = 'none';
           detailsTable.style.display = 'table';
         }
         
@@ -143,18 +155,24 @@
       }
     };
 
+    // Helper function to safely update element text
+    function updateElementText(id, text) {
+      const element = getElement(id);
+      if (element) element.textContent = text;
+    }
+
     function showError(message) {
-      const loadingDiv = document.getElementById('loadingData');
+      const loadingDiv = getElement('loadingData');
       if (loadingDiv) {
         loadingDiv.innerHTML = `
           <div style="color: #dc3545; padding: 15px; background: #f8d7da; border-radius: 4px; margin: 20px 0;">
             <p><strong>Error:</strong> ${message}</p>
-            <p>Please try again or contact our support team.</p>
+            <p>Please try again or contact support with your reference number.</p>
           </div>
         `;
       }
       
-      const detailsTable = document.getElementById('complaintDetails');
+      const detailsTable = getElement('complaintDetails');
       if (detailsTable) {
         detailsTable.style.display = 'none';
       }
