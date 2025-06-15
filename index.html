@@ -4,207 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Complaint Status | Kan Universal Pvt Ltd</title>
-  
-  <!-- Favicon (will now work properly on GitHub Pages) -->
   <link rel="icon" type="image/png" href="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png">
-  
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-  
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #f8f9fa;
-      padding: 0;
-      margin: 0;
-      color: #333;
-      line-height: 1.6;
-    }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    .logo {
-      height: 60px;
-      margin-right: 20px;
-    }
-    .company-name {
-      font-size: 24px;
-      font-weight: 600;
-      color: #07818c;
-      margin: 0;
-    }
-    .status-container {
-      background: white;
-      border-radius: 8px;
-      padding: 25px;
-      margin-bottom: 30px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    .status-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .ref-no {
-      font-size: 18px;
-      font-weight: 500;
-      color: #555;
-    }
-    .status-badge {
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: 500;
-      font-size: 14px;
-    }
-    .status-open {
-      background: #fff3cd;
-      color: #856404;
-    }
-    .status-resolved {
-      background: #d4edda;
-      color: #155724;
-    }
-    .status-process {
-      background: #cce5ff;
-      color: #004085;
-    }
-    .waiting-list {
-      background: #f8f9fa;
-      padding: 15px;
-      border-radius: 6px;
-      margin-top: 15px;
-      font-size: 15px;
-      border-left: 4px solid #07818c;
-    }
-    .details-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      margin-top: 20px;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
-    }
-    .details-table tr:first-child td:first-child {
-      border-top-left-radius: 8px;
-    }
-    .details-table tr:first-child td:last-child {
-      border-top-right-radius: 8px;
-    }
-    .details-table tr:last-child td:first-child {
-      border-bottom-left-radius: 8px;
-    }
-    .details-table tr:last-child td:last-child {
-      border-bottom-right-radius: 8px;
-    }
-    .field-name {
-      padding: 14px 20px;
-      font-weight: 500;
-      width: 30%;
-      background: #f8fafc;
-      border-bottom: 1px solid #e9ecef;
-      vertical-align: top;
-    }
-    .field-name-text {
-      position: relative;
-      padding-left: 12px;
-    }
-    .field-name-text:before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 6px;
-      height: 16px;
-      width: 4px;
-      background: #07818c;
-      border-radius: 2px;
-    }
-    .field-value {
-      padding: 14px 20px;
-      border-bottom: 1px solid #e9ecef;
-      color: #495057;
-    }
-    .footer {
-      text-align: center;
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #e0e0e0;
-      color: #666;
-      font-size: 14px;
-    }
-    .loading {
-      text-align: center;
-      padding: 20px;
-      color: #666;
-    }
-    @media (max-width: 768px) {
-      .container {
-        padding: 15px;
-      }
-      .header {
-        flex-direction: column;
-        text-align: center;
-      }
-      .logo {
-        margin-right: 0;
-        margin-bottom: 10px;
-      }
-      .status-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .field-name, .field-value {
-        width: auto;
-        display: block;
-        padding: 12px 15px;
-      }
-    }
+    /* (Keep all your existing CSS styles here) */
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <img src="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png" alt="Kan Universal Logo" class="logo">
-      <h1 class="company-name">Kan Universal Pvt Ltd</h1>
-    </div>
-    
-    <div class="status-container">
-      <div class="status-header">
-        <div>
-          <h2>Complaint Status</h2>
-          <div class="ref-no" id="refNo">Loading reference...</div>
-        </div>
-        <div class="status-badge" id="statusBadge">Loading...</div>
-      </div>
-      
-      <div class="waiting-list" id="statusMessage">
-        Loading status information...
-      </div>
-    </div>
-    
-    <h3 style="margin: 25px 0 15px; color: #07818c;">Complaint Details</h3>
-    <div id="loadingData" class="loading">
-      <p>Loading complaint details...</p>
-    </div>
-    <table class="details-table" id="complaintDetails" style="display: none;">
-      <!-- Data will be inserted here by JavaScript -->
-    </table>
-    
-    <div class="footer">
-      <p>© <span id="currentYear"></span> Kan Universal Pvt Ltd. All rights reserved.</p>
-      <p>For any queries, please contact our customer support.</p>
-    </div>
+    <!-- (Keep all your existing HTML structure here) -->
   </div>
 
   <script>
@@ -227,7 +35,7 @@
     function formatDate(dateString) {
       if (!dateString) return '';
       const date = new Date(dateString);
-      return isNaN(date) ? dateString : date.toLocaleString('en-IN', {
+      return isNaN(date.getTime()) ? dateString : date.toLocaleString('en-IN', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -239,23 +47,23 @@
     // Fetch complaint data from Google Apps Script
     async function fetchComplaintData() {
       if (!trackingId) {
-        showError("No tracking ID provided in URL");
+        showError("No tracking ID provided in URL. Please use the complete tracking link you received.");
         return;
       }
 
       try {
-        // Replace with your Google Apps Script Web App URL
-        const scriptUrl = `https://script.google.com/macros/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}`;
+        // Show loading state
+        document.getElementById('loadingData').style.display = 'block';
+        document.getElementById('complaintDetails').style.display = 'none';
+
+        // Use your Google Apps Script URL (Web App)
+        const scriptUrl = `https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}`;
         
+        // First fetch to get the HTML
         const response = await fetch(scriptUrl);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
         const html = await response.text();
         
-        // Parse the HTML to extract data (temporary solution)
+        // Create a temporary DOM parser to extract data
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
         
@@ -266,23 +74,30 @@
         
         if (statusBadge && refNoElement && statusMessage) {
           document.getElementById('statusBadge').className = statusBadge.className;
-          document.getElementById('statusBadge').textContent = statusBadge.textContent;
-          document.getElementById('refNo').textContent = refNoElement.textContent;
-          document.getElementById('statusMessage').textContent = statusMessage.textContent;
+          document.getElementById('statusBadge').textContent = statusBadge.textContent.trim();
+          document.getElementById('refNo').textContent = refNoElement.textContent.replace('Reference:', '').trim();
+          document.getElementById('statusMessage').innerHTML = statusMessage.innerHTML;
         }
         
-        // Extract table data
+        // Extract and display complaint details
         const tableRows = doc.querySelectorAll('.details-table tr');
         const detailsTable = document.getElementById('complaintDetails');
         detailsTable.innerHTML = '';
         
+        let hasData = false;
         tableRows.forEach(row => {
           const cells = row.querySelectorAll('td');
           if (cells.length === 2) {
             const fieldName = cells[0].textContent.trim();
-            const fieldValue = cells[1].textContent.trim();
+            let fieldValue = cells[1].textContent.trim();
+            
+            // Format date fields
+            if (['Timestamp', 'Record Time1', 'Record Time2'].includes(fieldName)) {
+              fieldValue = formatDate(fieldValue);
+            }
             
             if (fieldValue && !excludedColumns.includes(fieldName)) {
+              hasData = true;
               const newRow = document.createElement('tr');
               
               const nameCell = document.createElement('td');
@@ -301,27 +116,30 @@
         });
         
         document.getElementById('loadingData').style.display = 'none';
-        detailsTable.style.display = 'table';
+        detailsTable.style.display = hasData ? 'table' : 'none';
+        
+        if (!hasData) {
+          showError("No complaint data found for this tracking ID");
+        }
         
       } catch (error) {
-        console.error('Error fetching complaint data:', error);
-        showError("Failed to load complaint details. Please try again later.");
+        console.error('Error loading complaint data:', error);
+        showError("Failed to load complaint details. Please try again later or contact support.");
       }
     }
 
     function showError(message) {
       document.getElementById('loadingData').innerHTML = `
-        <p style="color: #dc3545;">Error: ${message}</p>
-        <p>Please check the tracking ID or contact support.</p>
+        <div style="color: #dc3545; padding: 15px; background: #f8d7da; border-radius: 4px; margin: 20px 0;">
+          <p><strong>Error:</strong> ${message}</p>
+          <p>If you believe this is incorrect, please contact our support team with your reference number.</p>
+        </div>
       `;
+      document.getElementById('complaintDetails').style.display = 'none';
     }
 
     // Initialize when page loads
-    if (trackingId) {
-      fetchComplaintData();
-    } else {
-      showError("No tracking ID provided in URL");
-    }
+    document.addEventListener('DOMContentLoaded', fetchComplaintData);
   </script>
 </body>
 </html>
