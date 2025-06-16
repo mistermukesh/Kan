@@ -13,6 +13,9 @@
       --border-color: #e0e0e0;
       --bg-color: #f8f9fa;
       --highlight-color: #f1f9fa;
+      --status-open: #ff9800;
+      --status-process: #2196f3;
+      --status-resolved: #4caf50;
     }
     
     body {
@@ -94,6 +97,31 @@
       font-size: 15px;
     }
     
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 14px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    
+    .status-open-badge {
+      background-color: var(--status-open);
+      color: white;
+    }
+    
+    .status-process-badge {
+      background-color: var(--status-process);
+      color: white;
+    }
+    
+    .status-resolved-badge {
+      background-color: var(--status-resolved);
+      color: white;
+    }
+    
     .details-title {
       font-size: 18px;
       font-weight: 600;
@@ -111,6 +139,10 @@
       margin-bottom: 5px;
     }
     
+    .detail-value {
+      font-weight: 400;
+    }
+    
     .footer {
       text-align: center;
       padding: 20px;
@@ -118,6 +150,21 @@
       border-top: 1px solid var(--border-color);
       color: var(--secondary-color);
       font-size: 14px;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: var(--secondary-color);
+    }
+    
+    .error {
+      color: #f44336;
+      background: #ffebee;
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 4px solid #f44336;
+      margin: 15px 0;
     }
     
     @media (max-width: 600px) {
@@ -148,8 +195,10 @@
     </div>
     
     <div class="section">
-      <h2 class="status-header">Complaint Status —<span id="refNo"></span></h2>
-      <div class="status-message" id="statusMessage"></div>
+      <h2 class="status-header">Complaint Status — <span id="refNo"></span></h2>
+      <div class="status-message" id="statusMessage">
+        <div class="loading">Loading complaint status...</div>
+      </div>
     </div>
     
     <hr class="section-divider">
@@ -157,7 +206,7 @@
     <div class="section">
       <h2 class="details-title">Complaint Details</h2>
       <div id="complaintDetails">
-        <!-- Details will be inserted here by JavaScript -->
+        <div class="loading">Loading complaint details...</div>
       </div>
     </div>
     
@@ -168,12 +217,110 @@
   </div>
 
   <script>
-    // This would be your existing JavaScript code to load data
-    // Kept here just as a placeholder - use your actual implementation
     document.addEventListener('DOMContentLoaded', function() {
+      // Set current year in footer
       document.getElementById('currentYear').textContent = new Date().getFullYear();
-      // Your data loading logic would go here
+      
+      // Get the tracking ID from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const trackingId = urlParams.get('id');
+      
+      if (!trackingId) {
+        showError('No tracking ID provided in URL');
+        return;
+      }
+      
+      // Fetch complaint data with cache-busting parameter
+      fetchComplaintData(trackingId);
     });
+    
+    function fetchComplaintData(trackingId) {
+      // Add timestamp to URL to prevent caching
+      const timestamp = new Date().getTime();
+      const apiUrl = `https://script.google.com/macros/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}&_=${timestamp}`;
+      
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+            showError(data.message);
+          } else {
+            displayComplaintData(data);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching complaint data:', error);
+          showError('Failed to load complaint data. Please try again later.');
+        });
+    }
+    
+    function displayComplaintData(data) {
+      // Display reference number
+      document.getElementById('refNo').textContent = data.refNo || 'N/A';
+      
+      // Display status message with badge
+      const statusMessage = document.getElementById('statusMessage');
+      statusMessage.innerHTML = '';
+      
+      // Create status badge based on status
+      const statusBadge = document.createElement('span');
+      statusBadge.className = `status-badge ${data.statusClass}-badge`;
+      statusBadge.textContent = data.status;
+      
+      // Add badge to status header
+      const statusHeader = document.querySelector('.status-header');
+      statusHeader.appendChild(statusBadge);
+      
+      // Add status message
+      const messageContent = document.createElement('div');
+      messageContent.textContent = data.statusMessage;
+      statusMessage.appendChild(messageContent);
+      
+      // Display complaint details
+      const detailsContainer = document.getElementById('complaintDetails');
+      detailsContainer.innerHTML = '';
+      
+      if (Object.keys(data.details).length === 0) {
+        const noDetails = document.createElement('div');
+        noDetails.textContent = 'No additional details available';
+        detailsContainer.appendChild(noDetails);
+      } else {
+        for (const [label, value] of Object.entries(data.details)) {
+          const detailItem = document.createElement('div');
+          detailItem.className = 'details-item';
+          
+          const detailLabel = document.createElement('div');
+          detailLabel.className = 'detail-label';
+          detailLabel.textContent = label;
+          
+          const detailValue = document.createElement('div');
+          detailValue.className = 'detail-value';
+          detailValue.textContent = value;
+          
+          detailItem.appendChild(detailLabel);
+          detailItem.appendChild(detailValue);
+          detailsContainer.appendChild(detailItem);
+        }
+      }
+    }
+    
+    function showError(message) {
+      const statusMessage = document.getElementById('statusMessage');
+      statusMessage.innerHTML = '';
+      
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error';
+      errorDiv.textContent = message;
+      statusMessage.appendChild(errorDiv);
+      
+      // Also clear the loading message from details section
+      document.getElementById('complaintDetails').innerHTML = '';
+    }
   </script>
 </body>
 </html>
