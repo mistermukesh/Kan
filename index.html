@@ -4,135 +4,159 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Complaint Status | Kan Universal Pvt Ltd</title>
-  <link rel="icon" type="image/png" href="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary-color: #07818c;
-      --secondary-color: #555;
-      --border-color: #e0e0e0;
-      --bg-color: #f8f9fa;
-      --highlight-color: #f1f9fa;
-    }
-    
     body {
       font-family: 'Poppins', sans-serif;
-      background: var(--bg-color);
+      background: #f8f9fa;
+      padding: 0;
+      margin: 0;
       color: #333;
       line-height: 1.6;
-      margin: 0;
-      padding: 0;
     }
-    
     .container {
-      max-width: 800px;
-      margin: 30px auto;
-      background: white;
-      box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    
-    .header {
-      text-align: center;
-      padding: 30px 20px 20px;
-      background: white;
-    }
-    
-    .logo-container {
-      margin-bottom: 10px;
-    }
-    
-    .logo-line1 {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--primary-color);
-      margin: 0;
-      line-height: 1;
-    }
-    
-    .logo-line2 {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--primary-color);
-      margin: 0;
-      line-height: 1;
-    }
-    
-    .company-subtitle {
-      font-size: 16px;
-      color: var(--secondary-color);
-      margin: 5px 0 0;
-      font-weight: 400;
-    }
-    
-    .section {
-      padding: 0 30px;
-      margin: 25px 0;
-    }
-    
-    .section-divider {
-      border: none;
-      height: 1px;
-      background-color: var(--border-color);
-      margin: 25px 30px;
-    }
-    
-    .status-header {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--primary-color);
-      margin-bottom: 15px;
-    }
-    
-    .status-message {
-      background: var(--highlight-color);
-      padding: 15px;
-      border-radius: 6px;
-      border-left: 4px solid var(--primary-color);
-      margin: 15px 0;
-      font-size: 15px;
-    }
-    
-    .details-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--primary-color);
-      margin-bottom: 15px;
-    }
-    
-    .details-item {
-      margin-bottom: 12px;
-    }
-    
-    .detail-label {
-      font-weight: 500;
-      color: var(--secondary-color);
-      margin-bottom: 5px;
-    }
-    
-    .footer {
-      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
       padding: 20px;
-      margin-top: 30px;
-      border-top: 1px solid var(--border-color);
-      color: var(--secondary-color);
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .logo {
+      height: 60px;
+      margin-right: 20px;
+    }
+    .company-name {
+      font-size: 24px;
+      font-weight: 600;
+      color: #07818c;
+      margin: 0;
+    }
+    .status-container {
+      background: white;
+      border-radius: 8px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .ref-no {
+      font-size: 18px;
+      font-weight: 500;
+      color: #555;
+    }
+    .status-badge {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 500;
       font-size: 14px;
     }
-    
-    @media (max-width: 600px) {
+    .status-open {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .status-resolved {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status-process {
+      background: #cce5ff;
+      color: #004085;
+    }
+    .waiting-list {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 15px;
+      font-size: 15px;
+      border-left: 4px solid #07818c;
+    }
+    .details-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 20px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    }
+    .details-table tr:first-child td:first-child {
+      border-top-left-radius: 8px;
+    }
+    .details-table tr:first-child td:last-child {
+      border-top-right-radius: 8px;
+    }
+    .details-table tr:last-child td:first-child {
+      border-bottom-left-radius: 8px;
+    }
+    .details-table tr:last-child td:last-child {
+      border-bottom-right-radius: 8px;
+    }
+    .field-name {
+      padding: 14px 20px;
+      font-weight: 500;
+      width: 30%;
+      background: #f8fafc;
+      border-bottom: 1px solid #e9ecef;
+      vertical-align: top;
+    }
+    .field-name-text {
+      position: relative;
+      padding-left: 12px;
+    }
+    .field-name-text:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      height: 16px;
+      width: 4px;
+      background: #07818c;
+      border-radius: 2px;
+    }
+    .field-value {
+      padding: 14px 20px;
+      border-bottom: 1px solid #e9ecef;
+      color: #495057;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+      color: #666;
+      font-size: 14px;
+    }
+    @media (max-width: 768px) {
       .container {
-        margin: 15px;
-        border-radius: 0;
+        padding: 15px;
       }
-      
-      .section {
-        padding: 0 20px;
+      .header {
+        flex-direction: column;
+        text-align: center;
       }
-      
-      .logo-line1,
-      .logo-line2 {
-        font-size: 24px;
+      .logo {
+        margin-right: 0;
+        margin-bottom: 10px;
+      }
+      .status-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .field-name, .field-value {
+        width: auto;
+        display: block;
+        padding: 12px 15px;
       }
     }
   </style>
@@ -140,40 +164,133 @@
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo-container">
-        <h1 class="logo-line1">KAN</h1>
-        <h1 class="logo-line2">UNIVERSAL</h1>
+      <img src="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png" alt="Kan Universal Logo" class="logo">
+      <h1 class="company-name">Kan Universal Pvt Ltd</h1>
+    </div>
+    
+    <div class="status-container">
+      <div class="status-header">
+        <div>
+          <h2>Complaint Status</h2>
+          <div class="ref-no" id="refNo"></div>
+        </div>
+        <div class="status-badge" id="statusBadge"></div>
       </div>
-      <p class="company-subtitle">Kan Universal Pvt Ltd</p>
+      
+      <div class="waiting-list" id="statusMessage"></div>
     </div>
     
-    <div class="section">
-      <h2 class="status-header">Complaint Status —<span id="refNo"></span></h2>
-      <div class="status-message" id="statusMessage"></div>
-    </div>
-    
-    <hr class="section-divider">
-    
-    <div class="section">
-      <h2 class="details-title">Complaint Details</h2>
-      <div id="complaintDetails">
-        <!-- Details will be inserted here by JavaScript -->
-      </div>
-    </div>
+    <h3 style="margin: 25px 0 15px; color: #07818c;">Complaint Details</h3>
+    <table class="details-table" id="complaintDetails">
+      <!-- Details will be inserted here by JavaScript -->
+    </table>
     
     <div class="footer">
       <p>© <span id="currentYear"></span> Kan Universal Pvt Ltd. All rights reserved.</p>
-      <p>For any queries, please contact our customer support</p>
+      <p>For any queries, please contact our customer support.</p>
     </div>
   </div>
 
   <script>
-    // This would be your existing JavaScript code to load data
-    // Kept here just as a placeholder - use your actual implementation
     document.addEventListener('DOMContentLoaded', function() {
+      // Set current year in footer
       document.getElementById('currentYear').textContent = new Date().getFullYear();
-      // Your data loading logic would go here
+      
+      // Get tracking ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const trackingId = urlParams.get('id');
+      
+      if (!trackingId) {
+        showError("Tracking ID missing in URL");
+        return;
+      }
+      
+      // Fetch complaint data from Google Apps Script
+      fetchComplaintData(trackingId);
     });
+    
+    function fetchComplaintData(trackingId) {
+      const scriptUrl = 'https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec';
+      
+      fetch(`${scriptUrl}?id=${trackingId}&callback=handleResponse`, {
+        method: 'GET',
+        mode: 'no-cors'
+      })
+      .then(response => {
+        // Since we're using no-cors, we can't read the response directly
+        // Instead, we'll use JSONP by creating a script tag
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = `${scriptUrl}?id=${trackingId}&callback=handleResponse`;
+          document.body.appendChild(script);
+          
+          window.handleResponse = function(data) {
+            document.body.removeChild(script);
+            delete window.handleResponse;
+            
+            if (data.error) {
+              reject(data.message);
+            } else {
+              resolve(data);
+            }
+          };
+          
+          setTimeout(() => {
+            document.body.removeChild(script);
+            delete window.handleResponse;
+            reject('Request timeout');
+          }, 10000);
+        });
+      })
+      .then(data => {
+        displayComplaintData(data);
+      })
+      .catch(error => {
+        showError(error);
+      });
+    }
+    
+    function displayComplaintData(data) {
+      // Display reference number
+      document.getElementById('refNo').textContent = `Reference: ${data.refNo}`;
+      
+      // Display status badge
+      const statusBadge = document.getElementById('statusBadge');
+      statusBadge.textContent = data.status;
+      statusBadge.className = `status-badge ${data.statusClass}`;
+      
+      // Display status message
+      document.getElementById('statusMessage').textContent = data.statusMessage;
+      
+      // Display complaint details
+      const detailsTable = document.getElementById('complaintDetails');
+      
+      for (const [header, value] of Object.entries(data.details)) {
+        const row = document.createElement('tr');
+        
+        const nameCell = document.createElement('td');
+        nameCell.className = 'field-name';
+        nameCell.innerHTML = `<span class="field-name-text">${header}</span>`;
+        
+        const valueCell = document.createElement('td');
+        valueCell.className = 'field-value';
+        valueCell.textContent = value;
+        
+        row.appendChild(nameCell);
+        row.appendChild(valueCell);
+        detailsTable.appendChild(row);
+      }
+    }
+    
+    function showError(message) {
+      const statusContainer = document.querySelector('.status-container');
+      statusContainer.innerHTML = `
+        <div style="color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; 
+                    padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+          <strong>Error:</strong> ${message}
+        </div>
+      `;
+    }
   </script>
 </body>
 </html>
