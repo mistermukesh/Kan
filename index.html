@@ -49,7 +49,7 @@
 
       // Add timestamp to prevent caching
       const timestamp = new Date().getTime();
-      const scriptUrl = `https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?id=${trackingId}&_=${timestamp}`;
+      const scriptUrl = `https://script.google.com/macros/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}&_=${timestamp}`;
       
       fetch(scriptUrl)
         .then(response => {
