@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,6 +13,10 @@
       --border-color: #e0e0e0;
       --bg-color: #f8f9fa;
       --highlight-color: #f1f9fa;
+      --open-color: #ff9800;
+      --process-color: #2196f3;
+      --resolved-color: #4caf50;
+      --error-color: #d32f2f;
     }
     
     body {
@@ -87,12 +90,32 @@
     }
     
     .status-message {
-      background: var(--highlight-color);
       padding: 15px;
       border-radius: 6px;
       border-left: 4px solid var(--primary-color);
       margin: 15px 0;
       font-size: 15px;
+      transition: all 0.3s ease;
+    }
+    
+    .status-open {
+      border-left-color: var(--open-color);
+      background-color: #fff3e0;
+    }
+    
+    .status-process {
+      border-left-color: var(--process-color);
+      background-color: #e3f2fd;
+    }
+    
+    .status-resolved {
+      border-left-color: var(--resolved-color);
+      background-color: #e8f5e9;
+    }
+    
+    .status-error {
+      border-left-color: var(--error-color);
+      background-color: #ffebee;
     }
     
     .details-title {
@@ -119,6 +142,25 @@
       border-top: 1px solid var(--border-color);
       color: var(--secondary-color);
       font-size: 14px;
+    }
+    
+    .loading {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
     
     @media (max-width: 600px) {
@@ -150,7 +192,11 @@
     
     <div class="section">
       <h2 class="status-header">Complaint Status —<span id="refNo"></span></h2>
-      <div class="status-message" id="statusMessage"></div>
+      <div class="status-message" id="statusMessage">
+        <div class="loading">
+          <div class="spinner"></div>
+        </div>
+      </div>
     </div>
     
     <hr class="section-divider">
@@ -178,7 +224,7 @@
       const trackingId = urlParams.get('id');
       
       if (!trackingId) {
-        showError('No tracking ID provided in the URL');
+        showError('No tracking ID provided in the URL. Please check your tracking link.');
         return;
       }
       
@@ -190,6 +236,10 @@
       // Add cache-busting parameter to prevent caching
       const cacheBuster = 't=' + new Date().getTime();
       const apiUrl = `https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?id=${trackingId}&${cacheBuster}`;
+      
+      // Show loading state
+      const statusMessageElement = document.getElementById('statusMessage');
+      statusMessageElement.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
       
       fetch(apiUrl)
         .then(response => {
@@ -207,7 +257,7 @@
         })
         .catch(error => {
           console.error('Error fetching complaint data:', error);
-          showError('Failed to load complaint data. Please try again.');
+          showError('Failed to load complaint data. Please try again later.');
         });
     }
     
@@ -220,32 +270,39 @@
       
       // Update status message
       const statusMessageElement = document.getElementById('statusMessage');
-      if (statusMessageElement && data.statusMessage) {
-        statusMessageElement.textContent = data.statusMessage;
-        
-        // Add status class
-        statusMessageElement.classList.add(data.statusClass || 'status-open');
+      if (statusMessageElement) {
+        if (data.statusMessage) {
+          statusMessageElement.textContent = data.statusMessage;
+          statusMessageElement.className = 'status-message ' + (data.statusClass || 'status-open');
+        } else {
+          statusMessageElement.textContent = 'Status information not available';
+          statusMessageElement.className = 'status-message status-error';
+        }
       }
       
       // Update complaint details
       const detailsContainer = document.getElementById('complaintDetails');
-      if (detailsContainer && data.details) {
+      if (detailsContainer) {
         detailsContainer.innerHTML = '';
         
-        for (const [key, value] of Object.entries(data.details)) {
-          const detailItem = document.createElement('div');
-          detailItem.className = 'details-item';
-          
-          const label = document.createElement('div');
-          label.className = 'detail-label';
-          label.textContent = key;
-          
-          const content = document.createElement('div');
-          content.textContent = value;
-          
-          detailItem.appendChild(label);
-          detailItem.appendChild(content);
-          detailsContainer.appendChild(detailItem);
+        if (data.details && Object.keys(data.details).length > 0) {
+          for (const [key, value] of Object.entries(data.details)) {
+            const detailItem = document.createElement('div');
+            detailItem.className = 'details-item';
+            
+            const label = document.createElement('div');
+            label.className = 'detail-label';
+            label.textContent = key;
+            
+            const content = document.createElement('div');
+            content.textContent = value;
+            
+            detailItem.appendChild(label);
+            detailItem.appendChild(content);
+            detailsContainer.appendChild(detailItem);
+          }
+        } else {
+          detailsContainer.innerHTML = '<p>No additional details available for this complaint.</p>';
         }
       }
     }
@@ -253,10 +310,13 @@
     function showError(message) {
       const statusMessageElement = document.getElementById('statusMessage');
       if (statusMessageElement) {
-        statusMessageElement.textContent = message;
-        statusMessageElement.style.color = '#d32f2f';
-        statusMessageElement.style.backgroundColor = '#ffebee';
-        statusMessageElement.style.borderLeft = '4px solid #d32f2f';
+        statusMessageElement.innerHTML = message;
+        statusMessageElement.className = 'status-message status-error';
+      }
+      
+      const detailsContainer = document.getElementById('complaintDetails');
+      if (detailsContainer) {
+        detailsContainer.innerHTML = '';
       }
     }
   </script>
