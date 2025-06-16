@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Complaint Status | Kan Universal Pvt Ltd</title>
+  <link rel="icon" type="image/png" href="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/mbyxrl4f.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -137,6 +138,25 @@
       color: #666;
       font-size: 14px;
     }
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid #07818c;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
     @media (max-width: 768px) {
       .container {
         padding: 15px;
@@ -168,22 +188,12 @@
       <h1 class="company-name">Kan Universal Pvt Ltd</h1>
     </div>
     
-    <div class="status-container">
-      <div class="status-header">
-        <div>
-          <h2>Complaint Status</h2>
-          <div class="ref-no" id="refNo"></div>
-        </div>
-        <div class="status-badge" id="statusBadge"></div>
+    <div id="content">
+      <div class="loading">
+        <div class="spinner"></div>
+        <div>Loading complaint details...</div>
       </div>
-      
-      <div class="waiting-list" id="statusMessage"></div>
     </div>
-    
-    <h3 style="margin: 25px 0 15px; color: #07818c;">Complaint Details</h3>
-    <table class="details-table" id="complaintDetails">
-      <!-- Details will be inserted here by JavaScript -->
-    </table>
     
     <div class="footer">
       <p>© <span id="currentYear"></span> Kan Universal Pvt Ltd. All rights reserved.</p>
@@ -205,64 +215,94 @@
         return;
       }
       
-      // Fetch complaint data from Google Apps Script
-      fetchComplaintData(trackingId);
+      // Start loading immediately
+      const startTime = Date.now();
+      const timeout = 15000; // 15 seconds timeout
+      
+      // Try primary endpoint first
+      fetchComplaintData(trackingId, startTime, timeout)
+        .catch(error => {
+          console.error('Primary endpoint failed, trying fallback:', error);
+          // Try fallback endpoint if primary fails
+          return fetchComplaintData(trackingId, startTime, timeout, true);
+        });
     });
     
-    function fetchComplaintData(trackingId) {
-      const scriptUrl = 'https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec';
-      
-      fetch(`${scriptUrl}?id=${trackingId}&callback=handleResponse`, {
-        method: 'GET',
-        mode: 'no-cors'
-      })
-      .then(response => {
-        // Since we're using no-cors, we can't read the response directly
-        // Instead, we'll use JSONP by creating a script tag
-        return new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = `${scriptUrl}?id=${trackingId}&callback=handleResponse`;
-          document.body.appendChild(script);
-          
-          window.handleResponse = function(data) {
-            document.body.removeChild(script);
-            delete window.handleResponse;
-            
-            if (data.error) {
-              reject(data.message);
-            } else {
-              resolve(data);
-            }
-          };
-          
-          setTimeout(() => {
-            document.body.removeChild(script);
-            delete window.handleResponse;
-            reject('Request timeout');
-          }, 10000);
-        });
-      })
-      .then(data => {
-        displayComplaintData(data);
-      })
-      .catch(error => {
-        showError(error);
+    function fetchComplaintData(trackingId, startTime, timeout, useFallback = false) {
+      return new Promise((resolve, reject) => {
+        const scriptUrl = useFallback 
+          ? 'https://script.google.com/macros/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec'
+          : 'https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec';
+        
+        // Timeout check
+        const timeoutId = setTimeout(() => {
+          cleanup();
+          showError("Request timed out. Please try again later.");
+          reject('Request timeout');
+        }, timeout - (Date.now() - startTime));
+        
+        // Create unique callback name
+        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+        
+        // Setup cleanup function
+        const cleanup = () => {
+          clearTimeout(timeoutId);
+          delete window[callbackName];
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+        };
+        
+        // Create script tag
+        const script = document.createElement('script');
+        script.src = `${scriptUrl}?id=${trackingId}&callback=${callbackName}`;
+        
+        // Setup callback
+        window[callbackName] = (data) => {
+          cleanup();
+          if (data.error) {
+            showError(data.message);
+            reject(data.message);
+          } else {
+            displayComplaintData(data);
+            resolve(data);
+          }
+        };
+        
+        // Error handling
+        script.onerror = () => {
+          cleanup();
+          showError("Failed to load data. Please check your connection and try again.");
+          reject('Script load error');
+        };
+        
+        // Start request
+        document.body.appendChild(script);
       });
     }
     
     function displayComplaintData(data) {
-      // Display reference number
-      document.getElementById('refNo').textContent = `Reference: ${data.refNo}`;
+      const contentDiv = document.getElementById('content');
       
-      // Display status badge
-      const statusBadge = document.getElementById('statusBadge');
-      statusBadge.textContent = data.status;
-      statusBadge.className = `status-badge ${data.statusClass}`;
+      contentDiv.innerHTML = `
+        <div class="status-container">
+          <div class="status-header">
+            <div>
+              <h2>Complaint Status</h2>
+              <div class="ref-no">Reference: ${data.refNo}</div>
+            </div>
+            <div class="status-badge ${data.statusClass}">${data.status}</div>
+          </div>
+          
+          <div class="waiting-list">
+            ${data.statusMessage}
+          </div>
+        </div>
+        
+        <h3 style="margin: 25px 0 15px; color: #07818c;">Complaint Details</h3>
+        <table class="details-table" id="complaintDetails"></table>
+      `;
       
-      // Display status message
-      document.getElementById('statusMessage').textContent = data.statusMessage;
-      
-      // Display complaint details
       const detailsTable = document.getElementById('complaintDetails');
       
       for (const [header, value] of Object.entries(data.details)) {
@@ -283,11 +323,20 @@
     }
     
     function showError(message) {
-      const statusContainer = document.querySelector('.status-container');
-      statusContainer.innerHTML = `
-        <div style="color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; 
-                    padding: 15px; border-radius: 4px; margin-bottom: 20px;">
-          <strong>Error:</strong> ${message}
+      const contentDiv = document.getElementById('content');
+      contentDiv.innerHTML = `
+        <div class="status-container">
+          <div style="color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; 
+                      padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+            <strong>Error:</strong> ${message}
+          </div>
+          <p>Please try the following:</p>
+          <ul>
+            <li>Check that the URL is correct</li>
+            <li>Refresh the page</li>
+            <li>Try again later</li>
+            <li>Contact support if the problem persists</li>
+          </ul>
         </div>
       `;
     }
