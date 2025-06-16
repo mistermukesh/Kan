@@ -192,105 +192,168 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Set current year in footer
-      document.getElementById('currentYear').textContent = new Date().getFullYear();
-      
-      // Get tracking ID from URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const trackingId = urlParams.get('id');
-      
-      if (!trackingId) {
-        showError("Tracking ID missing in URL");
-        return;
-      }
-      
-      // Fetch complaint data from Google Apps Script
-      fetchComplaintData(trackingId);
-    });
+  document.addEventListener('DOMContentLoaded', function() {
+    // Set current year in footer
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
     
-    function fetchComplaintData(trackingId) {
-      const scriptUrl = 'https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec';
-      
-      fetch(`${scriptUrl}?id=${trackingId}&callback=handleResponse`, {
-        method: 'GET',
-        mode: 'no-cors'
-      })
+    // Get tracking ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const trackingId = urlParams.get('id');
+    
+    if (!trackingId) {
+      showError("Tracking ID missing in URL. Please check your link.");
+      return;
+    }
+    
+    // Show loading state
+    showLoading();
+    
+    // Fetch complaint data from Google Apps Script
+    fetchComplaintData(trackingId);
+  });
+  
+  function fetchComplaintData(trackingId) {
+    // Updated to use direct JSON endpoint
+    const scriptUrl = 'https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec';
+    const url = `${scriptUrl}?id=${trackingId}`;
+    
+    // Create a timestamp parameter to prevent caching
+    const timestamp = new Date().getTime();
+    const freshUrl = `${url}&_=${timestamp}`;
+    
+    // First try with CORS (proper fetch)
+    fetch(freshUrl)
       .then(response => {
-        // Since we're using no-cors, we can't read the response directly
-        // Instead, we'll use JSONP by creating a script tag
-        return new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = `${scriptUrl}?id=${trackingId}&callback=handleResponse`;
-          document.body.appendChild(script);
-          
-          window.handleResponse = function(data) {
-            document.body.removeChild(script);
-            delete window.handleResponse;
-            
-            if (data.error) {
-              reject(data.message);
-            } else {
-              resolve(data);
-            }
-          };
-          
-          setTimeout(() => {
-            document.body.removeChild(script);
-            delete window.handleResponse;
-            reject('Request timeout');
-          }, 10000);
-        });
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
       })
       .then(data => {
+        if (data.error) throw new Error(data.message);
         displayComplaintData(data);
       })
       .catch(error => {
-        showError(error);
+        console.log('Standard fetch failed, trying JSONP:', error);
+        // Fallback to JSONP if CORS fails
+        fetchWithJsonp(url, trackingId);
       });
-    }
+  }
+  
+  function fetchWithJsonp(url, trackingId) {
+    return new Promise((resolve, reject) => {
+      const callbackName = `jsonp_callback_${Math.round(100000 * Math.random())}`;
+      const script = document.createElement('script');
+      
+      window[callbackName] = function(data) {
+        delete window[callbackName];
+        document.body.removeChild(script);
+        
+        if (data.error) {
+          reject(data.message);
+        } else {
+          resolve(data);
+        }
+      };
+      
+      script.src = `${url}&callback=${callbackName}`;
+      script.onerror = () => {
+        reject('Failed to load script');
+      };
+      
+      document.body.appendChild(script);
+      
+      // Set timeout for JSONP request
+      setTimeout(() => {
+        if (window[callbackName]) {
+          delete window[callbackName];
+          reject('Request timeout - please check your internet connection and try again');
+        }
+      }, 8000); // 8 seconds timeout
+    })
+    .then(data => displayComplaintData(data))
+    .catch(error => showError(error));
+  }
+  
+  function showLoading() {
+    const statusContainer = document.querySelector('.status-container');
+    statusContainer.innerHTML = `
+      <div style="text-align: center; padding: 30px;">
+        <div style="display: inline-block; width: 50px; height: 50px; border: 5px solid #f3f3f3;
+                    border-top: 5px solid #07818c; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <p style="margin-top: 15px; color: #07818c;">Loading complaint details...</p>
+      </div>
+    `;
     
-    function displayComplaintData(data) {
-      // Display reference number
-      document.getElementById('refNo').textContent = `Reference: ${data.refNo}`;
-      
-      // Display status badge
-      const statusBadge = document.getElementById('statusBadge');
-      statusBadge.textContent = data.status;
-      statusBadge.className = `status-badge ${data.statusClass}`;
-      
-      // Display status message
-      document.getElementById('statusMessage').textContent = data.statusMessage;
-      
-      // Display complaint details
-      const detailsTable = document.getElementById('complaintDetails');
-      
-      for (const [header, value] of Object.entries(data.details)) {
-        const row = document.createElement('tr');
-        
-        const nameCell = document.createElement('td');
-        nameCell.className = 'field-name';
-        nameCell.innerHTML = `<span class="field-name-text">${header}</span>`;
-        
-        const valueCell = document.createElement('td');
-        valueCell.className = 'field-value';
-        valueCell.textContent = value;
-        
-        row.appendChild(nameCell);
-        row.appendChild(valueCell);
-        detailsTable.appendChild(row);
+    const detailsTable = document.getElementById('complaintDetails');
+    detailsTable.innerHTML = `
+      <tr>
+        <td colspan="2" style="text-align: center; padding: 20px;">
+          <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid #f3f3f3;
+                      border-top: 3px solid #07818c; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        </td>
+      </tr>
+    `;
+    
+    // Add CSS animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
-    }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  function displayComplaintData(data) {
+    // Display reference number
+    document.getElementById('refNo').textContent = `Reference: ${data.refNo}`;
     
-    function showError(message) {
-      const statusContainer = document.querySelector('.status-container');
-      statusContainer.innerHTML = `
-        <div style="color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; 
-                    padding: 15px; border-radius: 4px; margin-bottom: 20px;">
-          <strong>Error:</strong> ${message}
-        </div>
-      `;
+    // Display status badge
+    const statusBadge = document.getElementById('statusBadge');
+    statusBadge.textContent = data.status;
+    statusBadge.className = `status-badge ${data.statusClass}`;
+    
+    // Display status message
+    document.getElementById('statusMessage').textContent = data.statusMessage;
+    
+    // Display complaint details
+    const detailsTable = document.getElementById('complaintDetails');
+    detailsTable.innerHTML = ''; // Clear loading state
+    
+    for (const [header, value] of Object.entries(data.details)) {
+      const row = document.createElement('tr');
+      
+      const nameCell = document.createElement('td');
+      nameCell.className = 'field-name';
+      nameCell.innerHTML = `<span class="field-name-text">${header}</span>`;
+      
+      const valueCell = document.createElement('td');
+      valueCell.className = 'field-value';
+      valueCell.textContent = value;
+      
+      row.appendChild(nameCell);
+      row.appendChild(valueCell);
+      detailsTable.appendChild(row);
     }
-  </script>
+  }
+  
+  function showError(message) {
+    const statusContainer = document.querySelector('.status-container');
+    statusContainer.innerHTML = `
+      <div style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb;
+                  padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+        <strong>Error:</strong> ${message}
+      </div>
+      <button onclick="window.location.reload(true)" 
+              style="background-color: #07818c; color: white; border: none;
+                     padding: 10px 15px; border-radius: 4px; cursor: pointer;">
+        Refresh Page
+      </button>
+      <p style="margin-top: 15px;">If the problem persists, please contact support.</p>
+    `;
+    
+    document.getElementById('complaintDetails').innerHTML = '';
+  }
+</script>
 </body>
 </html>
