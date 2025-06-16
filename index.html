@@ -169,12 +169,96 @@
   </div>
 
   <script>
-    // This would be your existing JavaScript code to load data
-    // Kept here just as a placeholder - use your actual implementation
     document.addEventListener('DOMContentLoaded', function() {
+      // Set current year
       document.getElementById('currentYear').textContent = new Date().getFullYear();
-      // Your data loading logic would go here
+      
+      // Get tracking ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const trackingId = urlParams.get('id');
+      
+      if (!trackingId) {
+        showError('No tracking ID provided in the URL');
+        return;
+      }
+      
+      // Fetch complaint data
+      fetchComplaintData(trackingId);
     });
+    
+    function fetchComplaintData(trackingId) {
+      // Add cache-busting parameter to prevent caching
+      const cacheBuster = 't=' + new Date().getTime();
+      const apiUrl = `https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?id=${trackingId}&${cacheBuster}`;
+      
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+            showError(data.message);
+          } else {
+            displayComplaintData(data);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching complaint data:', error);
+          showError('Failed to load complaint data. Please try again.');
+        });
+    }
+    
+    function displayComplaintData(data) {
+      // Update reference number
+      const refNoElement = document.getElementById('refNo');
+      if (refNoElement && data.refNo) {
+        refNoElement.textContent = ' ' + data.refNo;
+      }
+      
+      // Update status message
+      const statusMessageElement = document.getElementById('statusMessage');
+      if (statusMessageElement && data.statusMessage) {
+        statusMessageElement.textContent = data.statusMessage;
+        
+        // Add status class
+        statusMessageElement.classList.add(data.statusClass || 'status-open');
+      }
+      
+      // Update complaint details
+      const detailsContainer = document.getElementById('complaintDetails');
+      if (detailsContainer && data.details) {
+        detailsContainer.innerHTML = '';
+        
+        for (const [key, value] of Object.entries(data.details)) {
+          const detailItem = document.createElement('div');
+          detailItem.className = 'details-item';
+          
+          const label = document.createElement('div');
+          label.className = 'detail-label';
+          label.textContent = key;
+          
+          const content = document.createElement('div');
+          content.textContent = value;
+          
+          detailItem.appendChild(label);
+          detailItem.appendChild(content);
+          detailsContainer.appendChild(detailItem);
+        }
+      }
+    }
+    
+    function showError(message) {
+      const statusMessageElement = document.getElementById('statusMessage');
+      if (statusMessageElement) {
+        statusMessageElement.textContent = message;
+        statusMessageElement.style.color = '#d32f2f';
+        statusMessageElement.style.backgroundColor = '#ffebee';
+        statusMessageElement.style.borderLeft = '4px solid #d32f2f';
+      }
+    }
   </script>
 </body>
 </html>
