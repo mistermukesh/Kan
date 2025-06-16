@@ -1,134 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- [Previous head content remains the same] -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complaint Status | Kan Universal Pvt Ltd</title>
+  <link rel="icon" type="image/png" href="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    /* [Previous styles remain the same] */
-    
-    .error-message {
-      color: #d32f2f;
-      background-color: #ffebee;
-      padding: 15px;
-      border-radius: 6px;
-      border-left: 4px solid #d32f2f;
-      margin: 15px 0;
+    :root {
+      --primary-color: #07818c;
+      --secondary-color: #555;
+      --border-color: #e0e0e0;
+      --bg-color: #f8f9fa;
+      --highlight-color: #f1f9fa;
     }
     
-    .retry-button {
-      background-color: var(--primary-color);
-      color: white;
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-color);
+      color: #333;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: white;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .header {
+      text-align: center;
+      padding: 30px 20px 20px;
+      background: white;
+    }
+    
+    .logo-container {
+      margin-bottom: 10px;
+    }
+    
+    .logo-line1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin: 0;
+      line-height: 1;
+    }
+    
+    .logo-line2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin: 0;
+      line-height: 1;
+    }
+    
+    .company-subtitle {
+      font-size: 16px;
+      color: var(--secondary-color);
+      margin: 5px 0 0;
+      font-weight: 400;
+    }
+    
+    .section {
+      padding: 0 30px;
+      margin: 25px 0;
+    }
+    
+    .section-divider {
       border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 10px;
+      height: 1px;
+      background-color: var(--border-color);
+      margin: 25px 30px;
+    }
+    
+    .status-header {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+    
+    .status-message {
+      background: var(--highlight-color);
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 4px solid var(--primary-color);
+      margin: 15px 0;
+      font-size: 15px;
+    }
+    
+    .details-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+    
+    .details-item {
+      margin-bottom: 12px;
+    }
+    
+    .detail-label {
+      font-weight: 500;
+      color: var(--secondary-color);
+      margin-bottom: 5px;
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 20px;
+      margin-top: 30px;
+      border-top: 1px solid var(--border-color);
+      color: var(--secondary-color);
+      font-size: 14px;
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        margin: 15px;
+        border-radius: 0;
+      }
+      
+      .section {
+        padding: 0 20px;
+      }
+      
+      .logo-line1,
+      .logo-line2 {
+        font-size: 24px;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- [Previous HTML content remains the same until the script section] -->
+  <div class="container">
+    <div class="header">
+      <div class="logo-container">
+        <h1 class="logo-line1">KAN</h1>
+        <h1 class="logo-line2">UNIVERSAL</h1>
+      </div>
+      <p class="company-subtitle">Kan Universal Pvt Ltd</p>
+    </div>
+    
+    <div class="section">
+      <h2 class="status-header">Complaint Status —<span id="refNo"></span></h2>
+      <div class="status-message" id="statusMessage"></div>
+    </div>
+    
+    <hr class="section-divider">
+    
+    <div class="section">
+      <h2 class="details-title">Complaint Details</h2>
+      <div id="complaintDetails">
+        <!-- Details will be inserted here by JavaScript -->
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>© <span id="currentYear"></span> Kan Universal Pvt Ltd. All rights reserved.</p>
+      <p>For any queries, please contact our customer support</p>
+    </div>
+  </div>
 
   <script>
+    // This would be your existing JavaScript code to load data
+    // Kept here just as a placeholder - use your actual implementation
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('currentYear').textContent = new Date().getFullYear();
-      loadComplaintData();
+      // Your data loading logic would go here
     });
-
-    function loadComplaintData() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const trackingId = urlParams.get('id');
-      
-      if (!trackingId) {
-        showError('Error: No tracking ID provided in URL');
-        return;
-      }
-
-      // Clear previous content while loading
-      document.getElementById('statusMessage').innerHTML = '<div class="loading">Loading complaint status...</div>';
-      document.getElementById('complaintDetails').innerHTML = '<div class="loading">Loading complaint details...</div>';
-
-      // Add timestamp to prevent caching
-      const timestamp = new Date().getTime();
-      const scriptUrl = `https://script.google.com/macros/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}&_=${timestamp}`;
-      
-      fetch(scriptUrl)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data.error) {
-            showError(data.message);
-          } else {
-            displayComplaintData(data);
-          }
-        })
-        .catch(error => {
-          console.error('Fetch error:', error);
-          showError('Failed to load complaint data. Please try again later.', true);
-        });
-    }
-
-    function displayComplaintData(data) {
-      try {
-        // Display reference number
-        const refNoElement = document.getElementById('refNo');
-        refNoElement.textContent = data.refNo || 'N/A';
-
-        // Display status message
-        const statusMessage = document.getElementById('statusMessage');
-        statusMessage.innerHTML = '';
-
-        if (data.statusMessage) {
-          const messageDiv = document.createElement('div');
-          messageDiv.className = 'status-message';
-          messageDiv.textContent = data.statusMessage;
-          statusMessage.appendChild(messageDiv);
-        }
-
-        // Display complaint details
-        const detailsContainer = document.getElementById('complaintDetails');
-        detailsContainer.innerHTML = '';
-
-        if (data.details && Object.keys(data.details).length > 0) {
-          for (const [label, value] of Object.entries(data.details)) {
-            const detailItem = document.createElement('div');
-            detailItem.className = 'details-item';
-
-            const detailLabel = document.createElement('div');
-            detailLabel.className = 'detail-label';
-            detailLabel.textContent = label;
-
-            const detailValue = document.createElement('div');
-            detailValue.className = 'detail-value';
-            detailValue.textContent = value || 'Not specified';
-
-            detailItem.appendChild(detailLabel);
-            detailItem.appendChild(detailValue);
-            detailsContainer.appendChild(detailItem);
-          }
-        } else {
-          detailsContainer.innerHTML = '<div>No additional details available</div>';
-        }
-      } catch (error) {
-        console.error('Display error:', error);
-        showError('Error displaying complaint data');
-      }
-    }
-
-    function showError(message, showRetry = false) {
-      const statusMessage = document.getElementById('statusMessage');
-      statusMessage.innerHTML = `
-        <div class="error-message">
-          ${message}
-          ${showRetry ? '<button class="retry-button" onclick="loadComplaintData()">Try Again</button>' : ''}
-        </div>
-      `;
-      
-      document.getElementById('complaintDetails').innerHTML = '';
-    }
   </script>
 </body>
 </html>
