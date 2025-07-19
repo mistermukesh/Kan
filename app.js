@@ -1,7 +1,21 @@
-// Google Apps Script Endpoint URL (replace with your deployed web app URL)
-const GAS_URL = "https://script.google.com/a/macros/kanuniversal.com/s/AKfycbweGTwOivAslJOkCH3L3aN6ydeY4CE3UmPZb7JyN3AL3cUtEztmwiel-OaPN-TQn3TA/exec";
+const apiCall = function (functionName, params = {}) {
+  params = JSON.stringify(params);
+  return new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler((response) => resolve(JSON.parse(response)))
+      .withFailureHandler((error) => reject(error))
+      [functionName](params);
+  });
+};
 
-// Form configuration
+const getFormData = (form) => {
+  const data = {};
+  Object.entries(form).forEach(([key, item]) => {
+    data[key] = item.value;
+  });
+  return data
+};
+
 const form = {
   name: {
     label: "Name",
@@ -86,21 +100,6 @@ const form = {
   },
 };
 
-// API Call to Google Apps Script
-function apiCall(functionName, params = {}) {
-  const url = `${GAS_URL}?fn=${functionName}`;
-  return axios.post(url, params, {
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  })
-  .then(response => response.data)
-  .catch(error => {
-    console.error('API Error:', error);
-    throw error;
-  });
-}
-
 // File Upload Component
 Vue.component('my-file-upload', {
   template: `
@@ -118,6 +117,7 @@ Vue.component('my-file-upload', {
         :clearable="false"
         :error-messages="errorMessages"
         outlined
+        counter
       ></v-file-input>
       
       <v-progress-linear
@@ -482,7 +482,7 @@ new Vue({
   data: () => ({
     loading: false,
     title: "KAN Requisition Form",
-    subtitle: "Please fill out all required fields",
+    subtitle: "Requisition Form with Authorized Signature",
     form: JSON.parse(JSON.stringify(form)),
     snackbar: {
       show: false,
@@ -505,28 +505,39 @@ new Vue({
         return;
       }
       
+      // Additional validation for items
+      if (!this.form.items.value || this.form.items.value.length === 0) {
+        this.showSnackbar({
+          message: "At least one item is required",
+          color: "error"
+        });
+        return;
+      }
+      
+      // Additional validation for attachments
+      if (!this.form.attachments.value || this.form.attachments.value.length === 0) {
+        this.showSnackbar({
+          message: "At least one attachment is required",
+          color: "error"
+        });
+        return;
+      }
+      
+      if (this.form.attachments.value.length > 2) {
+        this.showSnackbar({
+          message: "Maximum 2 attachments allowed",
+          color: "error"
+        });
+        return;
+      }
+
       this.loading = true;
       
       try {
-        const formData = {
-          name: this.form.name.value,
-          party_name: this.form.party_name.value,
-          approved_by: this.form.approved_by.value,
-          deadline_days: this.form.deadline_days.value,
-          items: this.form.items.value,
-          date: this.form.date.value,
-          signature: this.form.signature.value,
-          attachments: this.form.attachments.value,
-        };
-        
+        const formData = getFormData(this.form);
         const response = await apiCall("submit", formData);
         
         if (response.success) {
-          this.showSnackbar({
-            message: response.message,
-            color: "success"
-          });
-          
           // Update attachment URLs
           if (response.attachmentLinks && response.attachmentLinks.length > 0) {
             this.form.attachments.value.forEach((file, index) => {
@@ -535,6 +546,11 @@ new Vue({
               }
             });
           }
+          
+          this.showSnackbar({
+            message: response.message,
+            color: "success"
+          });
           
           // Reset form
           this.$refs.form.reset();
@@ -555,19 +571,16 @@ new Vue({
       } finally {
         this.loading = false;
       }
-    },
-    loadReferenceData() {
-      apiCall("getRefData")
-        .then(({ names, approvers }) => {
-          this.form.name.items = names;
-          this.form.approved_by.items = approvers;
-        })
-        .catch((error) => {
-          console.error("Error fetching REF data:", error);
-        });
     }
   },
   mounted() {
-    this.loadReferenceData();
+    apiCall("getRefData")
+      .then(({ names, approvers }) => {
+        this.form.name.items = names;
+        this.form.approved_by.items = approvers;
+      })
+      .catch((error) => {
+        console.error("Error fetching REF data:", error);
+      });
   }
 });
