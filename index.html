@@ -113,10 +113,15 @@
       background-color: #f5f9ff;
     }
     
-    .signature-pad-container {
+    .signature-dialog {
+      width: 100%;
+      max-width: 600px;
+    }
+    
+    .signature-canvas {
       border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      overflow: hidden;
+      background-color: white;
+      touch-action: none;
     }
     
     .success-animation {
@@ -186,6 +191,10 @@
       
       .section-title {
         font-size: 1.1rem;
+      }
+      
+      .signature-dialog {
+        width: 95%;
       }
     }
   </style>
@@ -413,28 +422,26 @@
                 Authorization
               </div>
               
-              <div class="signature-pad-container">
-                <v-card>
-                  <v-card-title>
+              <v-card>
+                <v-card-text>
+                  <v-btn 
+                    color="primary" 
+                    @click="openSignatureDialog"
+                    :disabled="loading"
+                  >
                     <v-icon left>mdi-draw</v-icon>
-                    {{ form.signature.label }}
-                  </v-card-title>
-                  <v-card-text>
-                    <canvas ref="signaturePad" width="100%" height="200" style="border: 1px solid #e0e0e0; touch-action: none;"></canvas>
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-btn color="error" @click="clearSignature">
-                      <v-icon left>mdi-delete</v-icon>
-                      Clear
-                    </v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary" @click="saveSignature">
-                      <v-icon left>mdi-content-save</v-icon>
-                      Save Signature
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </div>
+                    {{ form.signature.value ? 'Edit Signature' : 'Add Signature' }}
+                  </v-btn>
+                  
+                  <div v-if="form.signature.value" class="mt-4">
+                    <v-img 
+                      :src="form.signature.value" 
+                      max-height="100"
+                      contain
+                    ></v-img>
+                  </div>
+                </v-card-text>
+              </v-card>
               
               <v-alert
                 v-if="form.signature.rules && form.signature.rules.some(rule => rule(form.signature.value) !== true)"
@@ -531,6 +538,40 @@
         </v-card>
       </v-container>
       
+      <!-- Signature Dialog -->
+      <v-dialog v-model="signatureDialog" max-width="600" persistent>
+        <v-card class="signature-dialog">
+          <v-card-title class="primary white--text">
+            <v-icon left color="white">mdi-draw</v-icon>
+            {{ form.signature.label }}
+          </v-card-title>
+          
+          <v-card-text class="pa-4">
+            <canvas 
+              ref="signaturePad" 
+              class="signature-canvas"
+              width="550" 
+              height="300"
+            ></canvas>
+          </v-card-text>
+          
+          <v-card-actions>
+            <v-btn color="error" @click="clearSignature">
+              <v-icon left>mdi-delete</v-icon>
+              Clear
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn color="secondary" @click="closeSignatureDialog">
+              Cancel
+            </v-btn>
+            <v-btn color="primary" @click="saveSignature">
+              <v-icon left>mdi-content-save</v-icon>
+              Save Signature
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      
       <!-- Snackbar for messages -->
       <v-snackbar v-model="snackbar.show" :color="snackbar.color" bottom :timeout="6000">
         <span style="font-size:1.1rem">{{ snackbar.message }}</span>
@@ -565,6 +606,7 @@
       uploading: false,
       uploadProgress: 0,
       fileErrors: [],
+      signatureDialog: false,
       signaturePad: null,
       snackbar: {
         show: false,
@@ -639,7 +681,6 @@
       }
     }),
     mounted() {
-      this.initSignaturePad();
       this.fetchRefData();
       
       // Set default item if empty
@@ -648,6 +689,17 @@
       }
     },
     methods: {
+      openSignatureDialog() {
+        this.signatureDialog = true;
+        this.$nextTick(() => {
+          this.initSignaturePad();
+        });
+      },
+      
+      closeSignatureDialog() {
+        this.signatureDialog = false;
+      },
+      
       initSignaturePad() {
         const canvas = this.$refs.signaturePad;
         this.signaturePad = new SignaturePad(canvas, {
@@ -655,20 +707,7 @@
           penColor: 'rgb(0, 0, 0)'
         });
         
-        // Handle resizing
-        window.addEventListener('resize', this.resizeSignaturePad);
-        this.resizeSignaturePad();
-      },
-      
-      resizeSignaturePad() {
-        const canvas = this.$refs.signaturePad;
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        
-        canvas.width = canvas.offsetWidth * ratio;
-        canvas.height = canvas.offsetHeight * ratio;
-        canvas.getContext("2d").scale(ratio, ratio);
-        
-        // Redraw signature if exists
+        // If there's an existing signature, load it
         if (this.form.signature.value) {
           this.signaturePad.fromDataURL(this.form.signature.value);
         }
@@ -676,7 +715,6 @@
       
       clearSignature() {
         this.signaturePad.clear();
-        this.form.signature.value = "";
       },
       
       saveSignature() {
@@ -686,6 +724,7 @@
         }
         
         this.form.signature.value = this.signaturePad.toDataURL();
+        this.signatureDialog = false;
         this.showSnackbar({ message: "Signature saved successfully", color: "success" });
       },
       
@@ -898,7 +937,9 @@
         this.form.items.value = [{ sr_no: 1, description: "", quantity: 1 }];
         this.form.attachments.value = [];
         this.form.signature.value = "";
-        this.signaturePad.clear();
+        if (this.signaturePad) {
+          this.signaturePad.clear();
+        }
         this.submitted = false;
         this.fileErrors = [];
       }
