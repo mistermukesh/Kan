@@ -1,5 +1,5 @@
 // Google Apps Script Endpoint URL (replace with your deployed web app URL)
-const GAS_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+const GAS_URL = "https://script.google.com/a/macros/kanuniversal.com/s/AKfycbweGTwOivAslJOkCH3L3aN6ydeY4CE3UmPZb7JyN3AL3cUtEztmwiel-OaPN-TQn3TA/exec";
 
 // Form configuration
 const form = {
