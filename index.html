@@ -2,73 +2,53 @@
 <html>
 <head>
   <base target="_top">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
   <style>
     :root {
-      --primary-color: #3a4a6d;
-      --secondary-color: #ff7d47;
+      --primary-color: #3f51b5;
+      --secondary-color: #ff9800;
       --accent-color: #4caf50;
       --error-color: #f44336;
       --warning-color: #ffc107;
       --info-color: #2196f3;
-      --dark-color: #2d3748;
-      --light-color: #f8fafc;
-      --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --dark-color: #212121;
+      --light-color: #f5f5f5;
     }
     
     body {
       font-family: 'Poppins', sans-serif;
       background-color: #f5f7fa;
       color: var(--dark-color);
-      line-height: 1.6;
     }
     
     .app-container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 2rem;
+      padding: 20px;
     }
     
     .form-header {
-      background: linear-gradient(135deg, var(--primary-color) 0%, #4a5a8a 100%);
+      background: linear-gradient(135deg, var(--primary-color) 0%, #5c6bc0 100%);
       color: white;
       border-radius: 12px 12px 0 0;
-      padding: 2rem;
-      box-shadow: var(--card-shadow);
-      position: relative;
-      overflow: hidden;
+      padding: 25px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     
-    .form-header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 100%;
-      height: 100%;
-      background: url('https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png') no-repeat right center;
-      background-size: contain;
-      opacity: 0.1;
-      z-index: 0;
-    }
-    
-    .header-content {
-      position: relative;
-      z-index: 1;
+    .logo-container {
       display: flex;
       align-items: center;
     }
     
-    .logo-container {
-      margin-right: 1.5rem;
-    }
-    
     .logo {
-      height: 70px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+      height: 60px;
+      margin-right: 15px;
     }
     
     .header-text {
@@ -76,62 +56,57 @@
     }
     
     .form-title {
-      font-family: 'Montserrat', sans-serif;
       font-weight: 700;
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.5px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-size: 2rem;
+      margin-bottom: 5px;
+      letter-spacing: 0.5px;
     }
     
     .form-subtitle {
-      font-weight: 400;
+      font-weight: 300;
       opacity: 0.9;
       font-size: 1.1rem;
-      max-width: 600px;
     }
     
     .form-card {
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: var(--card-shadow);
-      margin-bottom: 2rem;
-      border: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+      border: 1px solid rgba(0,0,0,0.1);
     }
     
     .form-content {
-      padding: 2.5rem;
+      padding: 30px;
       background-color: white;
     }
     
     .section-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 600;
       color: var(--primary-color);
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e0e0e0;
       position: relative;
-      letter-spacing: -0.5px;
+      letter-spacing: 0.3px;
     }
     
-    .section-title::after {
+    .section-title:after {
       content: '';
       position: absolute;
       bottom: -2px;
       left: 0;
-      width: 80px;
+      width: 60px;
       height: 3px;
       background-color: var(--secondary-color);
       border-radius: 3px;
     }
     
     .v-input__slot {
-      background-color: #f8fafc !important;
+      background-color: #f8f9fa !important;
       border-radius: 8px !important;
-      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
-      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
     }
     
     .v-text-field--filled > .v-input__control > .v-input__slot {
@@ -140,11 +115,7 @@
     
     .v-label {
       font-weight: 500 !important;
-      color: #4a5568 !important;
-      font-size: 0.95rem !important;
-    }
-    
-    .v-input__control input {
+      color: #555 !important;
       font-size: 1rem !important;
     }
     
@@ -152,121 +123,71 @@
       font-size: 1.1rem;
       font-weight: 600;
       letter-spacing: 0.5px;
-      height: 56px;
+      height: 50px;
       width: 220px;
-      margin-top: 1.5rem;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-top: 20px;
+      transition: all 0.3s ease;
       text-transform: uppercase;
       border-radius: 8px !important;
-      background: linear-gradient(to right, var(--primary-color), #4a5a8a) !important;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     
     .submit-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 5px 15px rgba(63, 81, 181, 0.3) !important;
     }
     
     .file-preview-item {
-      background-color: #f8fafc;
+      background-color: #f8f9fa;
       border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 0.75rem;
+      padding: 12px;
+      margin-bottom: 10px;
       transition: all 0.2s ease;
-      border: 1px dashed #cbd5e0;
+      border: 1px dashed rgba(0,0,0,0.1);
     }
     
     .file-preview-item:hover {
-      background-color: #edf2f7;
-      border-color: var(--primary-color);
+      background-color: #e9ecef;
+      transform: translateX(2px);
     }
     
     .signature-pad-container {
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e0e0e0;
       border-radius: 8px;
       overflow: hidden;
-      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
     
     .v-snack__content {
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 500;
-      display: flex;
-      align-items: center;
     }
     
     .success-message {
-      background-color: white;
-      border-radius: 8px;
-      padding: 2rem;
-      text-align: center;
-      box-shadow: var(--card-shadow);
-      max-width: 500px;
-      margin: 0 auto;
+      font-size: 1.1rem;
+      line-height: 1.6;
     }
     
-    .success-icon {
-      font-size: 4rem;
-      color: #48bb78;
-      margin-bottom: 1rem;
-    }
-    
-    .success-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 700;
+    .success-message strong {
       color: var(--primary-color);
-      margin-bottom: 1rem;
-    }
-    
-    .success-id {
-      background-color: #ebf8ff;
-      color: #2b6cb0;
-      padding: 0.5rem 1rem;
-      border-radius: 9999px;
-      font-weight: 600;
-      display: inline-block;
-      margin: 0.5rem 0;
-    }
-    
-    .success-text {
-      color: #4a5568;
-      margin-bottom: 1.5rem;
-    }
-    
-    .success-actions {
-      margin-top: 1.5rem;
     }
     
     @media (max-width: 768px) {
-      .app-container {
-        padding: 1rem;
+      .form-content {
+        padding: 20px;
       }
       
       .form-header {
-        padding: 1.5rem;
-      }
-      
-      .header-content {
         flex-direction: column;
         text-align: center;
       }
       
       .logo-container {
-        margin-right: 0;
-        margin-bottom: 1rem;
-      }
-      
-      .form-title {
-        font-size: 1.8rem;
-      }
-      
-      .form-content {
-        padding: 1.5rem;
+        margin-bottom: 15px;
+        justify-content: center;
       }
       
       .section-title {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
       }
       
       .submit-btn {
@@ -279,12 +200,10 @@
   <div id="app">
     <v-app>
       <div class="app-container">
-        <v-card class="form-card" v-if="!submissionSuccess">
+        <v-card class="form-card">
           <div class="form-header">
-            <div class="header-content">
-              <div class="logo-container">
-                <img src="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png" alt="KAN Logo" class="logo">
-              </div>
+            <div class="logo-container">
+              <img src="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png" alt="KAN Logo" class="logo">
               <div class="header-text">
                 <h1 class="form-title">{{ title }}</h1>
                 <p class="form-subtitle">{{ subtitle }}</p>
@@ -358,33 +277,12 @@
             </v-form>
           </div>
         </v-card>
-        
-        <!-- Success Message -->
-        <div class="success-message" v-if="submissionSuccess">
-          <v-icon class="success-icon">mdi-check-circle</v-icon>
-          <h2 class="success-title">Submission Successful!</h2>
-          <p class="success-text">Your requisition has been received and processed successfully.</p>
-          <div class="success-id">ID: {{ submissionId }}</div>
-          <p class="success-text" v-if="submissionAttachments.length > 0">
-            Attachments have been uploaded and can be accessed via the links provided.
-          </p>
-          <div class="success-actions">
-            <v-btn
-              color="primary"
-              large
-              @click="resetForm"
-            >
-              <v-icon left>mdi-plus</v-icon>
-              Create Another Requisition
-            </v-btn>
-          </div>
-        </div>
       </div>
       
       <!-- Snackbar for messages -->
-      <v-snackbar v-model="snackbar.show" :color="snackbar.color" bottom :timeout="6000">
-        <v-icon left dark>{{ snackbar.icon }}</v-icon>
-        {{ snackbar.message }}
+      <v-snackbar v-model="snackbar.show" :color="snackbar.color" bottom :timeout="10000">
+        <div v-if="snackbar.color === 'success'" class="success-message" v-html="snackbar.message"></div>
+        <span v-else style="font-size:1.1rem">{{ snackbar.message }}</span>
         <template v-slot:action="{ attrs }">
           <v-btn color="white" text v-bind="attrs" @click="snackbar.show = false">
             Close
@@ -394,6 +292,9 @@
     </v-app>
   </div>
 
-  <?!= include("vuejs.html"); ?>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
