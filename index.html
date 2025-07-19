@@ -37,17 +37,35 @@
       border-radius: 8px 8px 0 0;
       padding: 25px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo {
+      height: 50px;
+      margin-right: 15px;
+    }
+    
+    .header-text {
+      flex-grow: 1;
     }
     
     .form-title {
       font-weight: 600;
-      font-size: 2rem;
+      font-size: 1.8rem;
       margin-bottom: 5px;
     }
     
     .form-subtitle {
       font-weight: 300;
       opacity: 0.9;
+      font-size: 1rem;
     }
     
     .form-card {
@@ -139,6 +157,16 @@
         padding: 20px;
       }
       
+      .form-header {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .logo-container {
+        margin-bottom: 15px;
+        justify-content: center;
+      }
+      
       .section-title {
         font-size: 1.1rem;
       }
@@ -155,8 +183,13 @@
       <div class="app-container">
         <v-card class="form-card">
           <div class="form-header">
-            <h1 class="form-title">{{ title }}</h1>
-            <p class="form-subtitle">{{ subtitle }}</p>
+            <div class="logo-container">
+              <img src="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png" alt="KAN Logo" class="logo">
+              <div class="header-text">
+                <h1 class="form-title">{{ title }}</h1>
+                <p class="form-subtitle">{{ subtitle }}</p>
+              </div>
+            </div>
           </div>
           
           <div class="form-content">
