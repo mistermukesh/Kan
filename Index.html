@@ -221,36 +221,30 @@
         </v-card>
         
         <!-- Success State -->
-       <!-- Replace your Vue template bindings with proper syntax -->
-<div v-if="submitted" class="success-animation">
-  <v-icon class="success-icon">mdi-check-circle</v-icon>
-  <h2>Requisition Submitted Successfully!</h2>
-  <p>Thank you for your submission. Your request is being processed.</p>
-  
-  <div class="submission-details">
-    <div class="detail-item">
-      <span class="detail-label">Submission ID:</span>
-      <span>{{ submissionId }}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Date & Time:</span>
-      <span>{{ submissionDate }}</span>
-    </div>
-    <div class="detail-item" v-if="attachmentLinks.length > 0">
-      <span class="detail-label">Attachments:</span>
-      <span>
-        <a v-for="(link, index) in attachmentLinks" :key="index" :href="link" target="_blank" style="margin-right: 10px;">
-          Attachment {{ index + 1 }}
-        </a>
-      </span>
-    </div>
-  </div>
-  
-  <v-btn color="primary" large @click="resetForm" class="mt-4">
-    <v-icon left>mdi-plus</v-icon>
-    Submit Another Requisition
-  </v-btn>
-</div>
+        <v-card v-else-if="submitted" class="form-card">
+          <div class="success-animation">
+            <v-icon class="success-icon">mdi-check-circle</v-icon>
+            <h2>Requisition Submitted Successfully!</h2>
+            <p>Thank you for your submission. Your request is being processed.</p>
+            
+            <div class="submission-details">
+              <div class="detail-item">
+                <span class="detail-label">Submission ID:</span>
+                <span>{{ submissionId }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Date & Time:</span>
+                <span>{{ submissionDate }}</span>
+              </div>
+              <div class="detail-item" v-if="attachmentLinks.length > 0">
+                <span class="detail-label">Attachments:</span>
+                <span>
+                  <a v-for="(link, index) in attachmentLinks" :key="index" :href="link" target="_blank" style="margin-right: 10px;">
+                    Attachment {{ index + 1 }}
+                  </a>
+                </span>
+              </div>
+            </div>
             
             <v-btn color="primary" large @click="resetForm" class="mt-4">
               <v-icon left>mdi-plus</v-icon>
@@ -834,7 +828,7 @@
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
       },
       
       showSnackbar({ message, color }) {
