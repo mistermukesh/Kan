@@ -867,6 +867,10 @@
           const response = await axios.post(API_URL, {
             action: 'submit',
             data: formData
+          }, {
+            headers: {
+              'Content-Type': 'application/json'
+            }
           });
           
           if (response.data.success) {
