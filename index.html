@@ -589,8 +589,6 @@
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
-  const API_URL = "https://script.google.com/a/macros/kanuniversal.com/s/AKfycbweGTwOivAslJOkCH3L3aN6ydeY4CE3UmPZb7JyN3AL3cUtEztmwiel-OaPN-TQn3TA/exec";
-  
   new Vue({
     el: '#app',
     vuetify: new Vuetify(),
@@ -730,7 +728,11 @@
       
       async fetchRefData() {
         try {
-          const response = await axios.get(API_URL, {
+          // Use a proxy to avoid CORS issues
+          const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+          const scriptUrl = 'https://script.google.com/a/macros/kanuniversal.com/s/AKfycbweGTwOivAslJOkCH3L3aN6ydeY4CE3UmPZb7JyN3AL3cUtEztmwiel-OaPN-TQn3TA/exec';
+          
+          const response = await axios.get(proxyUrl + scriptUrl, {
             params: {
               action: 'getRefData'
             }
@@ -867,7 +869,7 @@
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
       },
       
       showSnackbar({ message, color }) {
@@ -903,7 +905,11 @@
             attachments: this.form.attachments.value
           };
           
-          const response = await axios.post(API_URL, {
+          // Use a proxy to avoid CORS issues
+          const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+          const scriptUrl = 'https://script.google.com/a/macros/kanuniversal.com/s/AKfycbweGTwOivAslJOkCH3L3aN6ydeY4CE3UmPZb7JyN3AL3cUtEztmwiel-OaPN-TQn3TA/exec';
+          
+          const response = await axios.post(proxyUrl + scriptUrl, {
             action: 'submit',
             data: formData
           }, {
