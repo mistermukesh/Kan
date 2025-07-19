@@ -1,10 +1,32 @@
+// Configuration for your Google Apps Script Web App
+const GAS_WEB_APP_URL = "https://script.google.com/a/macros/kanuniversal.com/s/AKfycbweGTwOivAslJOkCH3L3aN6ydeY4CE3UmPZb7JyN3AL3cUtEztmwiel-OaPN-TQn3TA/exec";
+
+// Modified API call to work with GitHub Pages
 const apiCall = function (functionName, params = {}) {
-  params = JSON.stringify(params);
   return new Promise((resolve, reject) => {
-    google.script.run
-      .withSuccessHandler((response) => resolve(JSON.parse(response)))
-      .withFailureHandler((error) => reject(error))
-      [functionName](params);
+    const xhr = new XMLHttpRequest();
+    const url = `${GAS_WEB_APP_URL}?fn=${functionName}`;
+    
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        try {
+          resolve(JSON.parse(xhr.responseText));
+        } catch (e) {
+          reject(new Error("Failed to parse response"));
+        }
+      } else {
+        reject(new Error(xhr.statusText));
+      }
+    };
+    
+    xhr.onerror = function() {
+      reject(new Error("Network error"));
+    };
+    
+    xhr.send(JSON.stringify(params));
   });
 };
 
@@ -13,7 +35,7 @@ const getFormData = (form) => {
   Object.entries(form).forEach(([key, item]) => {
     data[key] = item.value;
   });
-  return data
+  return data;
 };
 
 const form = {
@@ -58,8 +80,8 @@ const form = {
     value: [],
     headers: [
       { text: "Sr. No", value: "sr_no" },
-      { text: "Item Name & Description", value: "description", rules: [v => !!v || "Required"] },
-      { text: "Quantity", value: "quantity", rules: [v => !!v || "Required"] },
+      { text: "Item Name & Description", value: "description", rules: [(v) => !!v || "Required"] },
+      { text: "Quantity", value: "quantity", rules: [(v) => !!v || "Required"] },
       { text: "Actions", value: "actions", sortable: false },
     ],
     disabled: false,
@@ -383,7 +405,7 @@ Vue.component('my-table', {
             dense
             outlined
             hide-details
-            :rules="headers.find(h => h.value === 'description').rules"
+            :rules="item.headers.find(h => h.value === 'description').rules"
           ></v-text-field>
         </template>
         
@@ -394,7 +416,7 @@ Vue.component('my-table', {
             dense
             outlined
             hide-details
-            :rules="headers.find(h => h.value === 'quantity').rules"
+            :rules="item.headers.find(h => h.value === 'quantity').rules"
           ></v-text-field>
         </template>
         
@@ -417,11 +439,6 @@ Vue.component('my-table', {
   `,
   props: {
     item: Object,
-  },
-  computed: {
-    headers() {
-      return this.item.headers;
-    }
   },
   methods: {
     addItem() {
@@ -457,6 +474,7 @@ Vue.component('my-input', {
       if (this.item.type === 'signature') return 'my-signature';
       if (this.item.type === 'table') return 'my-table';
       if (this.item.type === 'file') return 'my-file-upload';
+      if (this.item.type === 'select') return 'v-autocomplete';
       return 'v-text-field';
     }
   }
