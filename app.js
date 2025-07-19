@@ -1,3 +1,6 @@
+// Google Apps Script Endpoint URL (replace with your deployed web app URL)
+const GAS_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+
 // Form configuration
 const form = {
   name: {
@@ -82,6 +85,21 @@ const form = {
     uploadStatus: "",
   },
 };
+
+// API Call to Google Apps Script
+function apiCall(functionName, params = {}) {
+  const url = `${GAS_URL}?fn=${functionName}`;
+  return axios.post(url, params, {
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  })
+  .then(response => response.data)
+  .catch(error => {
+    console.error('API Error:', error);
+    throw error;
+  });
+}
 
 // File Upload Component
 Vue.component('my-file-upload', {
@@ -490,7 +508,6 @@ new Vue({
       this.loading = true;
       
       try {
-        // Prepare data for submission
         const formData = {
           name: this.form.name.value,
           party_name: this.form.party_name.value,
@@ -502,29 +519,33 @@ new Vue({
           attachments: this.form.attachments.value,
         };
         
-        // For GitHub Pages, we'll use localStorage to simulate data storage
-        const submissions = JSON.parse(localStorage.getItem('requisitions') || '[]');
-        const id = 'req-' + Date.now();
+        const response = await apiCall("submit", formData);
         
-        submissions.push({
-          id,
-          ...formData,
-          timestamp: new Date().toISOString(),
-          status: 'Submitted'
-        });
-        
-        localStorage.setItem('requisitions', JSON.stringify(submissions));
-        
-        this.showSnackbar({
-          message: `Form submitted successfully! Reference ID: ${id}`,
-          color: "success"
-        });
-        
-        // Reset form
-        this.$refs.form.reset();
-        this.form.items.value = [];
-        this.form.attachments.value = [];
-        
+        if (response.success) {
+          this.showSnackbar({
+            message: response.message,
+            color: "success"
+          });
+          
+          // Update attachment URLs
+          if (response.attachmentLinks && response.attachmentLinks.length > 0) {
+            this.form.attachments.value.forEach((file, index) => {
+              if (response.attachmentLinks[index]) {
+                file.url = response.attachmentLinks[index];
+              }
+            });
+          }
+          
+          // Reset form
+          this.$refs.form.reset();
+          this.form.items.value = [];
+          this.form.attachments.value = [];
+        } else {
+          this.showSnackbar({
+            message: response.message || "Submission failed",
+            color: "error"
+          });
+        }
       } catch (error) {
         console.error("Submission error:", error);
         this.showSnackbar({
@@ -536,17 +557,14 @@ new Vue({
       }
     },
     loadReferenceData() {
-      // Simulate loading reference data
-      setTimeout(() => {
-        this.form.name.items = [
-          "John Doe", "Jane Smith", "Robert Johnson", 
-          "Emily Davis", "Michael Wilson"
-        ];
-        this.form.approved_by.items = [
-          "Director", "Manager", "Supervisor",
-          "Department Head", "CEO"
-        ];
-      }, 500);
+      apiCall("getRefData")
+        .then(({ names, approvers }) => {
+          this.form.name.items = names;
+          this.form.approved_by.items = approvers;
+        })
+        .catch((error) => {
+          console.error("Error fetching REF data:", error);
+        });
     }
   },
   mounted() {
