@@ -1,197 +1,191 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KAN Universal - Requisition Form</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <link rel="icon" href="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png">
   <style>
     :root {
-      --primary-color: #3f51b5;
-      --secondary-color: #ff9800;
-      --accent-color: #4caf50;
-      --error-color: #f44336;
-      --warning-color: #ffc107;
-      --info-color: #2196f3;
-      --dark-color: #212121;
-      --light-color: #f5f5f5;
+      --primary-color: #1976D2;
+      --secondary-color: #424242;
+      --accent-color: #82B1FF;
+      --error-color: #FF5252;
+      --info-color: #2196F3;
+      --success-color: #4CAF50;
+      --warning-color: #FFC107;
+      --dark-color: #1E1E1E;
+      --light-color: #F5F5F5;
     }
     
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: #f5f7fa;
-      color: var(--dark-color);
+      background-color: #f8f9fa;
+      color: var(--secondary-color);
     }
     
-    .app-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .form-header {
-      background: linear-gradient(135deg, var(--primary-color) 0%, #5c6bc0 100%);
-      color: white;
-      border-radius: 12px 12px 0 0;
-      padding: 25px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    
-    .logo-container {
-      display: flex;
-      align-items: center;
-    }
-    
-    .logo {
-      height: 60px;
+    .kan-logo {
+      height: 50px;
       margin-right: 15px;
     }
     
-    .header-text {
-      flex-grow: 1;
+    .app-header {
+      background: linear-gradient(135deg, var(--primary-color) 0%, #0D47A1 100%);
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px 0 rgba(0,0,0,0.1);
     }
     
-    .form-title {
+    .app-title {
       font-weight: 700;
-      font-size: 2rem;
-      margin-bottom: 5px;
       letter-spacing: 0.5px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
     }
     
-    .form-subtitle {
+    .app-subtitle {
       font-weight: 300;
       opacity: 0.9;
-      font-size: 1.1rem;
+    }
+    
+    .form-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 15px;
     }
     
     .form-card {
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      margin-bottom: 30px;
-      border: 1px solid rgba(0,0,0,0.1);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      margin-bottom: 3rem;
     }
     
-    .form-content {
-      padding: 30px;
-      background-color: white;
+    .form-section {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .form-section:last-child {
+      border-bottom: none;
     }
     
     .section-title {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: 600;
       color: var(--primary-color);
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #e0e0e0;
-      position: relative;
-      letter-spacing: 0.3px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
     }
     
-    .section-title:after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 60px;
-      height: 3px;
-      background-color: var(--secondary-color);
-      border-radius: 3px;
-    }
-    
-    .v-input__slot {
-      background-color: #f8f9fa !important;
-      border-radius: 8px !important;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
-    }
-    
-    .v-text-field--filled > .v-input__control > .v-input__slot {
-      min-height: 56px;
-    }
-    
-    .v-label {
-      font-weight: 500 !important;
-      color: #555 !important;
-      font-size: 1rem !important;
+    .section-title .v-icon {
+      margin-right: 10px;
     }
     
     .submit-btn {
-      font-size: 1.1rem;
-      font-weight: 600;
       letter-spacing: 0.5px;
-      height: 50px;
-      width: 220px;
-      margin-top: 20px;
+      font-weight: 600;
+      height: 48px;
+      font-size: 1.1rem;
       transition: all 0.3s ease;
-      text-transform: uppercase;
-      border-radius: 8px !important;
     }
     
     .submit-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(63, 81, 181, 0.3) !important;
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
     }
     
-    .file-preview-item {
-      background-color: #f8f9fa;
+    .file-upload-container {
+      border: 2px dashed #e0e0e0;
       border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 10px;
-      transition: all 0.2s ease;
-      border: 1px dashed rgba(0,0,0,0.1);
+      padding: 20px;
+      background-color: #fafafa;
+      transition: all 0.3s ease;
     }
     
-    .file-preview-item:hover {
-      background-color: #e9ecef;
-      transform: translateX(2px);
+    .file-upload-container:hover {
+      border-color: var(--primary-color);
+      background-color: #f5f9ff;
     }
     
     .signature-pad-container {
       border: 1px solid #e0e0e0;
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
     
-    .v-snack__content {
-      font-size: 1.1rem;
-      font-weight: 500;
+    .success-animation {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
     }
     
-    .success-message {
-      font-size: 1.1rem;
-      line-height: 1.6;
+    .success-icon {
+      font-size: 5rem;
+      color: var(--success-color);
+      margin-bottom: 1.5rem;
+      animation: bounce 1s ease infinite;
     }
     
-    .success-message strong {
+    .processing-animation {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .processing-icon {
+      font-size: 4rem;
       color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      animation: spin 2s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .submission-details {
+      background-color: #f5f9ff;
+      border-left: 4px solid var(--primary-color);
+      padding: 1.5rem;
+      border-radius: 4px;
+      margin-top: 1.5rem;
+    }
+    
+    .detail-item {
+      margin-bottom: 0.5rem;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-right: 0.5rem;
     }
     
     @media (max-width: 768px) {
-      .form-content {
-        padding: 20px;
-      }
-      
-      .form-header {
-        flex-direction: column;
-        text-align: center;
-      }
-      
-      .logo-container {
-        margin-bottom: 15px;
-        justify-content: center;
+      .form-section {
+        padding: 1rem;
       }
       
       .section-title {
         font-size: 1.1rem;
-      }
-      
-      .submit-btn {
-        width: 100%;
       }
     }
   </style>
@@ -199,69 +193,327 @@
 <body>
   <div id="app">
     <v-app>
-      <div class="app-container">
-        <v-card class="form-card">
-          <div class="form-header">
-            <div class="logo-container">
-              <img src="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png" alt="KAN Logo" class="logo">
-              <div class="header-text">
-                <h1 class="form-title">{{ title }}</h1>
-                <p class="form-subtitle">{{ subtitle }}</p>
+      <!-- Header Section -->
+      <div class="app-header">
+        <v-container>
+          <v-row align="center">
+            <v-col cols="auto">
+              <img src="https://confidentialcontent.s3.eu-west-1.wasabisys.com/broadcast/m8saf4qe.png" alt="KAN Logo" class="kan-logo">
+            </v-col>
+            <v-col>
+              <h1 class="app-title">KAN Universal</h1>
+              <p class="app-subtitle">Requisition Form with Authorized Signature</p>
+            </v-col>
+          </v-row>
+        </v-container>
+      </div>
+      
+      <!-- Main Content -->
+      <v-container class="form-container">
+        <!-- Processing State -->
+        <v-card v-if="processing" class="form-card">
+          <div class="processing-animation">
+            <v-icon class="processing-icon">mdi-loading</v-icon>
+            <h2>Processing Your Requisition</h2>
+            <p>Please wait while we process your submission...</p>
+            <v-progress-linear indeterminate color="primary" height="6"></v-progress-linear>
+          </div>
+        </v-card>
+        
+        <!-- Success State -->
+        <v-card v-else-if="submitted" class="form-card">
+          <div class="success-animation">
+            <v-icon class="success-icon">mdi-check-circle</v-icon>
+            <h2>Requisition Submitted Successfully!</h2>
+            <p>Thank you for your submission. Your request is being processed.</p>
+            
+            <div class="submission-details">
+              <div class="detail-item">
+                <span class="detail-label">Submission ID:</span>
+                <span>{{ submissionId }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Date & Time:</span>
+                <span>{{ submissionDate }}</span>
+              </div>
+              <div class="detail-item" v-if="attachmentLinks.length > 0">
+                <span class="detail-label">Attachments:</span>
+                <span>
+                  <a v-for="(link, index) in attachmentLinks" :key="index" :href="link" target="_blank" style="margin-right: 10px;">
+                    Attachment {{ index + 1 }}
+                  </a>
+                </span>
               </div>
             </div>
+            
+            <v-btn color="primary" large @click="resetForm" class="mt-4">
+              <v-icon left>mdi-plus</v-icon>
+              Submit Another Requisition
+            </v-btn>
           </div>
-          
-          <div class="form-content">
-            <v-form ref="form" @submit.prevent="submit" :disabled="loading">
-              <!-- Section 1: Basic Information -->
-              <div class="mb-8">
-                <h3 class="section-title">1. Basic Information</h3>
-                <v-row>
-                  <v-col cols="12" md="6">
-                    <my-input :item="form.name"></my-input>
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <my-input :item="form.party_name"></my-input>
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <my-input :item="form.approved_by"></my-input>
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <my-input :item="form.deadline_days"></my-input>
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <my-input :item="form.date"></my-input>
-                  </v-col>
-                </v-row>
+        </v-card>
+        
+        <!-- Form State -->
+        <v-card v-else class="form-card">
+          <v-form ref="form" @submit.prevent="submitForm" :disabled="loading">
+            <!-- Section 1: Basic Information -->
+            <div class="form-section">
+              <div class="section-title">
+                <v-icon color="primary">mdi-account-details</v-icon>
+                Basic Information
               </div>
-
-              <!-- Section 2: Items -->
-              <div class="mb-8">
-                <h3 class="section-title">2. Items Details</h3>
-                <my-input :item="form.items"></my-input>
+              
+              <v-row>
+                <v-col cols="12" md="6">
+                  <v-autocomplete
+                    v-model="form.name.value"
+                    :items="form.name.items"
+                    :label="form.name.label"
+                    :rules="form.name.rules"
+                    filled
+                    clearable
+                    prepend-icon="mdi-account"
+                  ></v-autocomplete>
+                </v-col>
+                
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    v-model="form.party_name.value"
+                    :label="form.party_name.label"
+                    :rules="form.party_name.rules"
+                    filled
+                    prepend-icon="mdi-account-group"
+                  ></v-text-field>
+                </v-col>
+                
+                <v-col cols="12" md="6">
+                  <v-autocomplete
+                    v-model="form.approved_by.value"
+                    :items="form.approved_by.items"
+                    :label="form.approved_by.label"
+                    :rules="form.approved_by.rules"
+                    filled
+                    clearable
+                    prepend-icon="mdi-account-check"
+                  ></v-autocomplete>
+                </v-col>
+                
+                <v-col cols="12" md="6">
+                  <v-autocomplete
+                    v-model="form.deadline_days.value"
+                    :items="form.deadline_days.items"
+                    :label="form.deadline_days.label"
+                    :rules="form.deadline_days.rules"
+                    filled
+                    prepend-icon="mdi-calendar-clock"
+                  ></v-autocomplete>
+                </v-col>
+                
+                <v-col cols="12" md="6">
+                  <v-menu
+                    ref="dateMenu"
+                    v-model="dateMenu"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="form.date.value"
+                        :label="form.date.label"
+                        prepend-icon="mdi-calendar"
+                        readonly
+                        filled
+                        v-bind="attrs"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      v-model="form.date.value"
+                      no-title
+                      scrollable
+                      @input="dateMenu = false"
+                    ></v-date-picker>
+                  </v-menu>
+                </v-col>
+              </v-row>
+            </div>
+            
+            <!-- Section 2: Items -->
+            <div class="form-section">
+              <div class="section-title">
+                <v-icon color="primary">mdi-format-list-checks</v-icon>
+                Items Details
               </div>
-
-              <!-- Section 3: Authorization -->
-              <div class="mb-8">
-                <h3 class="section-title">3. Authorization</h3>
-                <my-input :item="form.signature"></my-input>
+              
+              <v-data-table
+                :headers="form.items.headers"
+                :items="form.items.value"
+                hide-default-footer
+                class="elevation-1"
+              >
+                <template v-slot:top>
+                  <v-toolbar flat>
+                    <v-toolbar-title>{{ form.items.label }}</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" @click="addItem">
+                      <v-icon left>mdi-plus</v-icon> Add Item
+                    </v-btn>
+                  </v-toolbar>
+                </template>
+                
+                <template v-slot:item.sr_no="{ item }">
+                  <v-text-field 
+                    v-model="item.sr_no" 
+                    type="number" 
+                    dense
+                    :rules="form.items.headers.find(h => h.value === 'sr_no').rules"
+                  ></v-text-field>
+                </template>
+                
+                <template v-slot:item.description="{ item }">
+                  <v-text-field 
+                    v-model="item.description" 
+                    dense
+                    :rules="form.items.headers.find(h => h.value === 'description').rules"
+                  ></v-text-field>
+                </template>
+                
+                <template v-slot:item.quantity="{ item }">
+                  <v-text-field 
+                    v-model="item.quantity" 
+                    type="number" 
+                    dense
+                    :rules="form.items.headers.find(h => h.value === 'quantity').rules"
+                  ></v-text-field>
+                </template>
+                
+                <template v-slot:item.actions="{ item }">
+                  <v-btn icon small color="error" @click="deleteItem(item)">
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </template>
+              </v-data-table>
+              
+              <v-alert
+                v-if="form.items.rules && form.items.rules.some(rule => rule(form.items.value) !== true)"
+                type="error"
+                dense
+                class="mt-2"
+              >
+                {{ form.items.rules.find(rule => rule(form.items.value) !== true)(form.items.value) }}
+              </v-alert>
+            </div>
+            
+            <!-- Section 3: Authorization -->
+            <div class="form-section">
+              <div class="section-title">
+                <v-icon color="primary">mdi-pen</v-icon>
+                Authorization
               </div>
-
-              <!-- Section 4: Attachments -->
-              <div class="mb-8">
-                <h3 class="section-title">4. Attachments</h3>
-                <my-input :item="form.attachments"></my-input>
+              
+              <div class="signature-pad-container">
+                <v-card>
+                  <v-card-title>
+                    <v-icon left>mdi-draw</v-icon>
+                    {{ form.signature.label }}
+                  </v-card-title>
+                  <v-card-text>
+                    <canvas ref="signaturePad" width="100%" height="200" style="border: 1px solid #e0e0e0; touch-action: none;"></canvas>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-btn color="error" @click="clearSignature">
+                      <v-icon left>mdi-delete</v-icon>
+                      Clear
+                    </v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" @click="saveSignature">
+                      <v-icon left>mdi-content-save</v-icon>
+                      Save Signature
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
               </div>
-
-              <!-- Submit Button -->
+              
+              <v-alert
+                v-if="form.signature.rules && form.signature.rules.some(rule => rule(form.signature.value) !== true)"
+                type="error"
+                dense
+                class="mt-2"
+              >
+                {{ form.signature.rules.find(rule => rule(form.signature.value) !== true)(form.signature.value) }}
+              </v-alert>
+            </div>
+            
+            <!-- Section 4: Attachments -->
+            <div class="form-section">
+              <div class="section-title">
+                <v-icon color="primary">mdi-paperclip</v-icon>
+                Attachments
+              </div>
+              
+              <div class="file-upload-container">
+                <v-file-input
+                  v-model="files"
+                  :label="form.attachments.label"
+                  prepend-icon="mdi-paperclip"
+                  multiple
+                  chips
+                  show-size
+                  @change="handleFileUpload"
+                  :loading="uploading"
+                  :disabled="uploading"
+                  :error-messages="fileErrors"
+                ></v-file-input>
+                
+                <v-progress-linear
+                  v-if="uploading"
+                  :value="uploadProgress"
+                  height="10"
+                  color="primary"
+                  striped
+                ></v-progress-linear>
+                
+                <v-alert
+                  v-if="form.attachments.uploadStatus"
+                  type="info"
+                  dense
+                  class="mt-2"
+                >
+                  {{ form.attachments.uploadStatus }}
+                </v-alert>
+                
+                <v-list v-if="form.attachments.value.length > 0" dense class="mt-2">
+                  <v-list-item v-for="(file, index) in form.attachments.value" :key="index">
+                    <v-list-item-icon>
+                      <v-icon color="primary">mdi-file-{{ getFileIcon(file.type) }}</v-icon>
+                    </v-list-item-icon>
+                    
+                    <v-list-item-content>
+                      <v-list-item-title>{{ file.filename }}</v-list-item-title>
+                      <v-list-item-subtitle>{{ formatFileSize(file.size) }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                    
+                    <v-list-item-action>
+                      <v-btn icon @click="removeFile(index)">
+                        <v-icon color="error">mdi-delete</v-icon>
+                      </v-btn>
+                    </v-list-item-action>
+                  </v-list-item>
+                </v-list>
+              </div>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="form-section text-center">
               <v-btn
                 type="submit"
                 color="primary"
+                x-large
                 class="submit-btn"
                 :loading="loading"
                 :disabled="loading"
-                depressed
-                large
               >
                 <template v-slot:loader>
                   <v-progress-circular
@@ -271,21 +523,20 @@
                     color="white"
                   />
                 </template>
-                <v-icon left v-if="!loading">mdi-send</v-icon>
-                <span v-if="!loading">Submit Requisition</span>
+                <v-icon left>mdi-send</v-icon>
+                Submit Requisition
               </v-btn>
-            </v-form>
-          </div>
+            </div>
+          </v-form>
         </v-card>
-      </div>
+      </v-container>
       
       <!-- Snackbar for messages -->
-      <v-snackbar v-model="snackbar.show" :color="snackbar.color" bottom :timeout="10000">
-        <div v-if="snackbar.color === 'success'" class="success-message" v-html="snackbar.message"></div>
-        <span v-else style="font-size:1.1rem">{{ snackbar.message }}</span>
+      <v-snackbar v-model="snackbar.show" :color="snackbar.color" bottom :timeout="6000">
+        <span style="font-size:1.1rem">{{ snackbar.message }}</span>
         <template v-slot:action="{ attrs }">
           <v-btn color="white" text v-bind="attrs" @click="snackbar.show = false">
-            Close
+            <v-icon>mdi-close</v-icon>
           </v-btn>
         </template>
       </v-snackbar>
@@ -295,6 +546,360 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
-  <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+  const API_URL = "https://script.google.com/a/macros/kanuniversal.com/s/AKfycbweGTwOivAslJOkCH3L3aN6ydeY4CE3UmPZb7JyN3AL3cUtEztmwiel-OaPN-TQn3TA/exec";
+  
+  new Vue({
+    el: '#app',
+    vuetify: new Vuetify(),
+    data: () => ({
+      loading: false,
+      processing: false,
+      submitted: false,
+      submissionId: '',
+      submissionDate: '',
+      attachmentLinks: [],
+      dateMenu: false,
+      files: [],
+      uploading: false,
+      uploadProgress: 0,
+      fileErrors: [],
+      signaturePad: null,
+      snackbar: {
+        show: false,
+        message: '',
+        color: ''
+      },
+      form: {
+        name: {
+          label: "Name",
+          type: "select",
+          value: "",
+          items: [],
+          rules: [v => !!v || "Name is required"]
+        },
+        party_name: {
+          label: "Party Name",
+          type: "text",
+          value: "",
+          rules: [v => !!v || "Party name is required"]
+        },
+        approved_by: {
+          label: "Approved By",
+          type: "select",
+          value: "",
+          items: [],
+          rules: [v => !!v || "Approver is required"]
+        },
+        deadline_days: {
+          label: "Deadline in Days",
+          type: "select",
+          value: "2",
+          items: [],
+          rules: [v => !!v || "Deadline is required"]
+        },
+        items: {
+          label: "Items (At least one required)",
+          type: "table",
+          value: [],
+          headers: [
+            { text: "Sr. No", value: "sr_no", rules: [v => !!v || "Required"] },
+            { text: "Item Name & Description", value: "description", rules: [v => !!v || "Required"] },
+            { text: "Quantity", value: "quantity", rules: [v => !!v || "Required"] },
+            { text: "Actions", value: "actions", sortable: false }
+          ],
+          rules: [
+            v => (v && v.length > 0) || "At least one item is required",
+            v => !v || v.every(item => item.description && item.quantity) || "All items must have description and quantity"
+          ]
+        },
+        date: {
+          label: "Date",
+          type: "date",
+          value: new Date().toISOString().substr(0, 10),
+          rules: [v => !!v || "Date is required"]
+        },
+        signature: {
+          label: "Signature",
+          type: "signature",
+          value: "",
+          rules: [v => !!v || "Signature is required"]
+        },
+        attachments: {
+          label: "Attachments (Max 2, 1 required)",
+          type: "file",
+          value: [],
+          uploadStatus: "",
+          rules: [
+            v => (v && v.length > 0) || "At least one attachment is required",
+            v => !v || v.length <= 2 || "Maximum 2 attachments allowed"
+          ]
+        }
+      }
+    }),
+    mounted() {
+      this.initSignaturePad();
+      this.fetchRefData();
+      
+      // Set default item if empty
+      if (this.form.items.value.length === 0) {
+        this.addItem();
+      }
+    },
+    methods: {
+      initSignaturePad() {
+        const canvas = this.$refs.signaturePad;
+        this.signaturePad = new SignaturePad(canvas, {
+          backgroundColor: 'rgb(255, 255, 255)',
+          penColor: 'rgb(0, 0, 0)'
+        });
+        
+        // Handle resizing
+        window.addEventListener('resize', this.resizeSignaturePad);
+        this.resizeSignaturePad();
+      },
+      
+      resizeSignaturePad() {
+        const canvas = this.$refs.signaturePad;
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+        
+        // Redraw signature if exists
+        if (this.form.signature.value) {
+          this.signaturePad.fromDataURL(this.form.signature.value);
+        }
+      },
+      
+      clearSignature() {
+        this.signaturePad.clear();
+        this.form.signature.value = "";
+      },
+      
+      saveSignature() {
+        if (this.signaturePad.isEmpty()) {
+          this.showSnackbar({ message: "Please provide a signature first", color: "error" });
+          return;
+        }
+        
+        this.form.signature.value = this.signaturePad.toDataURL();
+        this.showSnackbar({ message: "Signature saved successfully", color: "success" });
+      },
+      
+      async fetchRefData() {
+        try {
+          const response = await axios.get(API_URL, {
+            params: {
+              action: 'getRefData'
+            }
+          });
+          
+          if (response.data.success) {
+            this.form.name.items = response.data.names;
+            this.form.approved_by.items = response.data.approvers;
+            this.form.deadline_days.items = response.data.deadlines;
+          } else {
+            this.showSnackbar({ message: response.data.message || "Failed to load reference data", color: "error" });
+          }
+        } catch (error) {
+          console.error("Error fetching reference data:", error);
+          this.showSnackbar({ message: "Failed to load reference data", color: "error" });
+        }
+      },
+      
+      addItem() {
+        this.form.items.value.push({
+          sr_no: this.form.items.value.length + 1,
+          description: "",
+          quantity: 1
+        });
+      },
+      
+      deleteItem(item) {
+        const index = this.form.items.value.indexOf(item);
+        this.form.items.value.splice(index, 1);
+        
+        // Update serial numbers
+        this.form.items.value.forEach((item, index) => {
+          item.sr_no = index + 1;
+        });
+      },
+      
+      async handleFileUpload(files) {
+        if (!files || files.length === 0) return;
+        
+        // Validate before upload
+        if (files.length > 2) {
+          this.fileErrors = ["Maximum 2 attachments allowed"];
+          this.files = [];
+          return;
+        }
+        
+        if (this.form.attachments.value.length + files.length > 2) {
+          this.fileErrors = ["Total attachments cannot exceed 2"];
+          this.files = [];
+          return;
+        }
+        
+        this.uploading = true;
+        this.uploadProgress = 0;
+        this.form.attachments.uploadStatus = `Uploading ${files.length} file(s)...`;
+        this.fileErrors = [];
+        
+        for (const file of files) {
+          try {
+            const processedFile = await this.processFile(file);
+            this.form.attachments.value.push(processedFile);
+            this.uploadProgress += (100 / files.length);
+          } catch (error) {
+            console.error("Error processing file:", error);
+            this.fileErrors.push(`Error processing ${file.name}`);
+          }
+        }
+        
+        this.form.attachments.uploadStatus = `Upload complete! ${files.length} file(s) added.`;
+        setTimeout(() => {
+          this.form.attachments.uploadStatus = "";
+        }, 3000);
+        
+        this.uploading = false;
+        this.uploadProgress = 0;
+        this.files = [];
+      },
+      
+      async processFile(file) {
+        const base64 = await this.readFileAsBase64(file);
+        const fileType = file.type || this.getFileTypeFromName(file.name);
+        
+        return {
+          filename: file.name,
+          type: fileType,
+          size: file.size,
+          base64: base64,
+          url: null // Will be set after form submission
+        };
+      },
+      
+      readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = (error) => reject(error);
+          reader.readAsDataURL(file);
+        });
+      },
+      
+      removeFile(index) {
+        this.form.attachments.value.splice(index, 1);
+      },
+      
+      getFileIcon(fileType) {
+        if (!fileType) return 'outline';
+        if (fileType.includes('image')) return 'image-outline';
+        if (fileType.includes('pdf')) return 'pdf-box';
+        if (fileType.includes('word')) return 'word';
+        if (fileType.includes('excel')) return 'excel';
+        if (fileType.includes('zip')) return 'zip-box';
+        return 'outline';
+      },
+      
+      getFileTypeFromName(filename) {
+        const extension = filename.split('.').pop().toLowerCase();
+        const types = {
+          'jpg': 'image/jpeg',
+          'jpeg': 'image/jpeg',
+          'png': 'image/png',
+          'gif': 'image/gif',
+          'pdf': 'application/pdf',
+          'doc': 'application/msword',
+          'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'xls': 'application/vnd.ms-excel',
+          'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'zip': 'application/zip'
+        };
+        return types[extension] || 'application/octet-stream';
+      },
+      
+      formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
+      },
+      
+      showSnackbar({ message, color }) {
+        this.snackbar.message = message;
+        this.snackbar.color = color;
+        this.snackbar.show = true;
+      },
+      
+      async submitForm() {
+        if (!this.$refs.form.validate()) {
+          this.showSnackbar({ message: "Please fill all required fields correctly", color: "warning" });
+          return;
+        }
+        
+        // Additional validation for signature
+        if (!this.form.signature.value) {
+          this.showSnackbar({ message: "Please provide a signature", color: "warning" });
+          return;
+        }
+        
+        this.processing = true;
+        this.loading = true;
+        
+        try {
+          const formData = {
+            name: this.form.name.value,
+            party_name: this.form.party_name.value,
+            approved_by: this.form.approved_by.value,
+            deadline_days: this.form.deadline_days.value,
+            items: this.form.items.value,
+            date: this.form.date.value,
+            signature: this.form.signature.value,
+            attachments: this.form.attachments.value
+          };
+          
+          const response = await axios.post(API_URL, {
+            action: 'submit',
+            data: formData
+          });
+          
+          if (response.data.success) {
+            this.submissionId = response.data.submissionId;
+            this.submissionDate = new Date(response.data.timestamp).toLocaleString();
+            this.attachmentLinks = response.data.attachmentLinks || [];
+            this.submitted = true;
+          } else {
+            this.showSnackbar({ message: response.data.message || "Submission failed", color: "error" });
+          }
+        } catch (error) {
+          console.error("Submission error:", error);
+          this.showSnackbar({ 
+            message: error.response?.data?.message || "An error occurred during submission", 
+            color: "error" 
+          });
+        } finally {
+          this.processing = false;
+          this.loading = false;
+        }
+      },
+      
+      resetForm() {
+        this.$refs.form.reset();
+        this.form.items.value = [{ sr_no: 1, description: "", quantity: 1 }];
+        this.form.attachments.value = [];
+        this.form.signature.value = "";
+        this.signaturePad.clear();
+        this.submitted = false;
+        this.fileErrors = [];
+      }
+    }
+  });
+  </script>
 </body>
 </html>
