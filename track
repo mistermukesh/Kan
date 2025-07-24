@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complaint Status Tracker</title>
+    <style>
+        #status-container { margin: 20px; padding: 20px; border: 1px solid #ddd; }
+        #loading { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Complaint Status Tracker</h1>
+    
+    <div id="search-form">
+        <input type="text" id="complaint-id" placeholder="Enter Complaint ID">
+        <button onclick="trackComplaint()">Track</button>
+        <p>Or provide the ID in the URL like: ?id=your-complaint-id</p>
+    </div>
+    
+    <div id="loading">Loading...</div>
+    <div id="status-container"></div>
+
+    <script>
+        // Get the ID from URL or let user input it
+        function trackComplaint(id) {
+            const complaintId = id || document.getElementById('complaint-id').value || getQueryParam('id');
+            if (!complaintId) return;
+            
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('status-container').innerHTML = '';
+            
+            fetch(`https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${complaintId}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('status-container').innerHTML = html;
+                    document.getElementById('loading').style.display = 'none';
+                })
+                .catch(error => {
+                    document.getElementById('status-container').innerHTML = `Error loading status: ${error}`;
+                    document.getElementById('loading').style.display = 'none';
+                });
+        }
+
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Check for ID on page load
+        window.onload = function() {
+            const id = getQueryParam('id');
+            if (id) trackComplaint(id);
+        };
+    </script>
+</body>
+</html>
