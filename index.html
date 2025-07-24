@@ -7,7 +7,6 @@
         body {
             margin: 0;
             padding: 0;
-            background: #f5f5f5;
             font-family: Arial, sans-serif;
         }
         .loader-container {
@@ -37,22 +36,22 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .loader-text {
-            margin-top: 20px;
-            color: #3498db;
-            font-size: 18px;
-            font-weight: bold;
+        #content-frame {
+            width: 100%;
+            height: 100vh;
+            border: none;
         }
     </style>
 </head>
 <body>
     <div class="loader-container" id="loader">
         <div class="loader"></div>
-        <div class="loader-text">Loading Complaint Status...</div>
     </div>
+    
+    <iframe id="content-frame" style="display: none;"></iframe>
 
     <script>
-        // Force hard refresh (bypass cache)
+        // Force hard refresh
         if (performance.navigation.type === 1 || performance.navigation.type === 255) {
             const url = new URL(window.location.href);
             url.searchParams.set('t', Date.now());
@@ -64,25 +63,28 @@
             return urlParams.get(name);
         }
 
-        function redirectToAppScript() {
+        function loadAppScriptContent() {
             const complaintId = getQueryParam('id');
-            if (complaintId) {
-                // Show loader for at least 1.5 seconds for better UX
-                setTimeout(() => {
-                    window.location.href = `https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${complaintId}`;
-                }, 1500);
-            } else {
+            if (!complaintId) {
                 document.getElementById('loader').innerHTML = `
                     <div style="color: #e74c3c; text-align: center;">
                         <h2>No Complaint ID Found</h2>
                         <p>Please provide a complaint ID in the URL (e.g., ?id=your-complaint-id)</p>
                     </div>
                 `;
+                return;
             }
+
+            const frame = document.getElementById('content-frame');
+            frame.src = `https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${complaintId}`;
+            
+            frame.onload = function() {
+                document.getElementById('loader').style.display = 'none';
+                frame.style.display = 'block';
+            };
         }
 
-        // Start the process when page loads
-        window.onload = redirectToAppScript;
+        window.onload = loadAppScriptContent;
     </script>
 </body>
 </html>
