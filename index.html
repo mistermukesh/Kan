@@ -4,19 +4,59 @@
     <title>Complaint Status Tracker</title>
     <link rel="icon" type="image/png" href="https://kanuniversal.info/Favicon.png" />
     <style>
-        body { margin: 0; padding: 0; }
-        #status-container { width: 100%; height: 100vh; border: none; }
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            z-index: 1000;
+        }
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #3498db;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loader-text {
+            margin-top: 20px;
+            color: #3498db;
+            font-size: 18px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <div id="status-container"></div>
+    <div class="loader-container" id="loader">
+        <div class="loader"></div>
+        <div class="loader-text">Loading Complaint Status...</div>
+    </div>
 
     <script>
-        function trackComplaint(id) {
-            const complaintId = id || getQueryParam('id');
-            if (!complaintId) return;
-            
-            window.location.href = `https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${complaintId}`;
+        // Force hard refresh (bypass cache)
+        if (performance.navigation.type === 1 || performance.navigation.type === 255) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('t', Date.now());
+            window.history.replaceState({}, '', url);
         }
 
         function getQueryParam(name) {
@@ -24,11 +64,25 @@
             return urlParams.get(name);
         }
 
-        // Check for ID on page load
-        window.onload = function() {
-            const id = getQueryParam('id');
-            if (id) trackComplaint(id);
-        };
+        function redirectToAppScript() {
+            const complaintId = getQueryParam('id');
+            if (complaintId) {
+                // Show loader for at least 1.5 seconds for better UX
+                setTimeout(() => {
+                    window.location.href = `https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${complaintId}`;
+                }, 1500);
+            } else {
+                document.getElementById('loader').innerHTML = `
+                    <div style="color: #e74c3c; text-align: center;">
+                        <h2>No Complaint ID Found</h2>
+                        <p>Please provide a complaint ID in the URL (e.g., ?id=your-complaint-id)</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Start the process when page loads
+        window.onload = redirectToAppScript;
     </script>
 </body>
 </html>
