@@ -50,7 +50,7 @@
 
             // Add timestamp to force fresh load
             const timestamp = new Date().getTime();
-            fetch(`https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${trackingId}&t=${timestamp}`)
+            fetch(`https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxFACn66s7BATkY0JhiRoOY_ovj4gTJpxKqJqsb1FB-nTzm3aE4Krk2VvoLQxSvcqXd/exec?id=${trackingId}&t=${timestamp}`)
                 .then(response => response.text())
                 .then(html => {
                     document.getElementById('content').innerHTML = html;
