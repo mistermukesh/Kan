@@ -66,14 +66,18 @@
     const urlParams = new URLSearchParams(window.location.search);
     const taskId = urlParams.get('taskId');
     const id = urlParams.get('id');
+    const responseId = urlParams.get('responseId');
     
     // Construct the Apps Script URL
     let scriptUrl = 'https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxFACn66s7BATkY0JhiRoOY_ovj4gTJpxKqJqsb1FB-nTzm3aE4Krk2VvoLQxSvcqXd/exec';
     
+    // Add the appropriate parameter based on what's in the URL
     if (taskId) {
       scriptUrl += `?taskId=${encodeURIComponent(taskId)}`;
     } else if (id) {
       scriptUrl += `?id=${encodeURIComponent(id)}`;
+    } else if (responseId) {
+      scriptUrl += `?responseId=${encodeURIComponent(responseId)}`;
     }
     
     // Set iframe source
@@ -88,7 +92,19 @@
     function hardRefresh() {
       const iframe = document.getElementById('contentFrame');
       document.getElementById('loader').style.display = 'flex';
-      iframe.src = iframe.src.split('?')[0] + '?t=' + new Date().getTime();
+      
+      // Preserve the original parameter during refresh
+      const currentSrc = iframe.src;
+      const baseUrl = currentSrc.split('?')[0];
+      const params = new URLSearchParams(currentSrc.split('?')[1] || '');
+      
+      // Remove timestamp if it exists
+      params.delete('t');
+      
+      // Add new timestamp
+      params.set('t', new Date().getTime());
+      
+      iframe.src = baseUrl + '?' + params.toString();
     }
 
     // Refresh every 3000 seconds (adjust as needed)
