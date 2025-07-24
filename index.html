@@ -1,61 +1,149 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Complaint Status Tracker</title>
+    <title>KAN Universal - Tracking System</title>
     <link rel="icon" type="image/png" href="https://kanuniversal.info/Favicon.png" />
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
         }
-        .loader-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: white;
-            z-index: 1000;
+        
+        #status-container { 
+            margin: 20px 0; 
+            padding: 25px; 
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+        
+        #search-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        button:hover {
+            background-color: #3367d6;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo img {
+            height: 60px;
+        }
+        
+        /* Attractive loader */
         .loader {
-            width: 48px;
-            height: 48px;
-            border: 5px solid #3498db;
-            border-bottom-color: transparent;
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
+            display: none;
+            text-align: center;
+            margin: 30px 0;
         }
-        @keyframes rotation {
+        
+        .loader-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4285f4;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        #content-frame {
-            width: 100%;
-            height: 100vh;
-            border: none;
+        
+        .error-message {
+            color: #d32f2f;
+            padding: 15px;
+            background-color: #ffebee;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <div class="loader-container" id="loader">
-        <div class="loader"></div>
+    <div class="logo">
+        <img src="https://kanuniversal.info/Favicon.png" alt="KAN Universal Logo">
     </div>
     
-    <iframe id="content-frame" style="display: none;"></iframe>
+    <div id="search-form">
+        <input type="text" id="complaint-id" placeholder="Enter Tracking ID">
+        <button onclick="trackComplaint()">Track Status</button>
+    </div>
+    
+    <div id="loading" class="loader">
+        <div class="loader-spinner"></div>
+        <p>Fetching tracking details...</p>
+    </div>
+    
+    <div id="status-container"></div>
 
     <script>
-        // Force hard refresh
-        if (performance.navigation.type === 1 || performance.navigation.type === 255) {
-            const url = new URL(window.location.href);
-            url.searchParams.set('t', Date.now());
-            window.history.replaceState({}, '', url);
+        // Get the ID from URL or let user input it
+        function trackComplaint(id) {
+            const complaintId = id || document.getElementById('complaint-id').value || getQueryParam('id');
+            if (!complaintId) {
+                showError("Please enter a valid Tracking ID");
+                return;
+            }
+            
+            // Update URL without reloading
+            history.pushState(null, null, `?id=${complaintId}`);
+            
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('status-container').innerHTML = '';
+            
+            // Add timestamp to prevent caching
+            const timestamp = new Date().getTime();
+            fetch(`https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${complaintId}&t=${timestamp}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.text();
+                })
+                .then(html => {
+                    document.getElementById('status-container').innerHTML = html;
+                    document.getElementById('loading').style.display = 'none';
+                })
+                .catch(error => {
+                    showError(`Error loading tracking information: ${error.message}`);
+                    document.getElementById('loading').style.display = 'none';
+                });
+        }
+
+        function showError(message) {
+            document.getElementById('status-container').innerHTML = `
+                <div class="error-message">${message}</div>
+            `;
         }
 
         function getQueryParam(name) {
@@ -63,28 +151,21 @@
             return urlParams.get(name);
         }
 
-        function loadAppScriptContent() {
-            const complaintId = getQueryParam('id');
-            if (!complaintId) {
-                document.getElementById('loader').innerHTML = `
-                    <div style="color: #e74c3c; text-align: center;">
-                        <h2>No Complaint ID Found</h2>
-                        <p>Please provide a complaint ID in the URL (e.g., ?id=your-complaint-id)</p>
-                    </div>
-                `;
-                return;
+        // Check for ID on page load
+        window.onload = function() {
+            const id = getQueryParam('id');
+            if (id) {
+                document.getElementById('complaint-id').value = id;
+                trackComplaint(id);
             }
-
-            const frame = document.getElementById('content-frame');
-            frame.src = `https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxOPxiXlD0eixcG1IEX5g84MLKdylDg8W13Lg4WWnW548_htYglSpPEkyw8n2G0OEs4/exec?id=${complaintId}`;
-            
-            frame.onload = function() {
-                document.getElementById('loader').style.display = 'none';
-                frame.style.display = 'block';
-            };
-        }
-
-        window.onload = loadAppScriptContent;
+        };
+        
+        // Enable tracking by pressing Enter key
+        document.getElementById('complaint-id').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                trackComplaint();
+            }
+        });
     </script>
 </body>
 </html>
