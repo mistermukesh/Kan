@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KAN Purchase Request</title>
+  <title>KAN Complaint Status</title>
   <link rel="icon" type="image/png" href="https://kanuniversal.info/Favicon.png" />
-
+  
   <style>
     html, body {
       margin: 0;
@@ -56,13 +56,29 @@
 
   <iframe
     id="contentFrame"
-    src="https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxFACn66s7BATkY0JhiRoOY_ovj4gTJpxKqJqsb1FB-nTzm3aE4Krk2VvoLQxSvcqXd/exec"
     allowfullscreen
     loading="lazy"
     onload="hideLoader()">
   </iframe>
 
   <script>
+    // Get parameters from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskId = urlParams.get('taskId');
+    const id = urlParams.get('id');
+    
+    // Construct the Apps Script URL
+    let scriptUrl = 'https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxFACn66s7BATkY0JhiRoOY_ovj4gTJpxKqJqsb1FB-nTzm3aE4Krk2VvoLQxSvcqXd/exec';
+    
+    if (taskId) {
+      scriptUrl += `?taskId=${encodeURIComponent(taskId)}`;
+    } else if (id) {
+      scriptUrl += `?id=${encodeURIComponent(id)}`;
+    }
+    
+    // Set iframe source
+    document.getElementById('contentFrame').src = scriptUrl;
+    
     // Hide loader when iframe content is loaded
     function hideLoader() {
       document.getElementById('loader').style.display = 'none';
@@ -77,9 +93,6 @@
 
     // Refresh every 30 seconds (adjust as needed)
     setInterval(hardRefresh, 30000);
-
-    // Show loader initially
-    document.getElementById('loader').style.display = 'flex';
   </script>
 </body>
 </html>
