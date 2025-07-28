@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zoho Sales Order Slip</title>
+  <link rel="icon" type="image/png" href="https://kanuniversal.info/Favicon.png" />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background: #fff;
+    }
+
+    iframe {
+      border: none;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <iframe
+    id="contentFrame"
+    src="https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxKcSA_TkEi9-mALJHHZS7tY_yP_XrD8xdpdEh9BQZSz1LZWchgXvmzRikPVx0EIDrg/exec"
+    allowfullscreen
+    loading="lazy"
+    onload="hideLoader()">
+  </iframe>
+
+  <script>
+    // Hide loader when iframe content is loaded
+    function hideLoader() {
+      document.getElementById('loader').style.display = 'none';
+    }
+
+    // Hard refresh function
+    function hardRefresh() {
+      const iframe = document.getElementById('contentFrame');
+      document.getElementById('loader').style.display = 'flex';
+      // Add timestamp to force fresh load
+      const timestamp = new Date().getTime();
+      iframe.src = iframe.src.split('?')[0] + '?t=' + timestamp;
+    }
+
+    // Refresh every 3000 seconds (adjust time as needed)
+    setInterval(hardRefresh, 3000000);
+
+    // Show loader initially
+    document.getElementById('loader').style.display = 'flex';
+  </script>
+</body>
+</html>
