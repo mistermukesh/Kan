@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zoho Sales Order Slip</title>
   <link rel="icon" type="image/png" href="https://kanuniversal.info/Favicon.png" />
-
+  
+  <!-- Inline critical CSS -->
   <style>
     html, body {
       margin: 0;
@@ -19,6 +20,7 @@
       border: none;
       width: 100vw;
       height: 100vh;
+      visibility: hidden; /* Hide until loaded */
     }
 
     .loader {
@@ -47,10 +49,17 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    
+    .loaded iframe {
+      visibility: visible;
+    }
+    .loaded .loader {
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <div id="loader" class="loader">
+  <div class="loader">
     <div class="spinner"></div>
   </div>
 
@@ -58,30 +67,43 @@
     id="contentFrame"
     src="https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxKcSA_TkEi9-mALJHHZS7tY_yP_XrD8xdpdEh9BQZSz1LZWchgXvmzRikPVx0EIDrg/exec"
     allowfullscreen
-    loading="lazy"
+    loading="eager" <!-- Changed from lazy to eager -->
     onload="hideLoader()">
   </iframe>
 
   <script>
+    // Preload the iframe URL
+    const iframeUrl = "https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxKcSA_TkEi9-mALJHHZS7tY_yP_XrD8xdpdEh9BQZSz1LZWchgXvmzRikPVx0EIDrg/exec";
+    
+    // Create link preload element
+    const link = document.createElement('link');
+    link.rel = 'preconnect';
+    link.href = 'https://script.google.com';
+    document.head.appendChild(link);
+    
     // Hide loader when iframe content is loaded
     function hideLoader() {
-      document.getElementById('loader').style.display = 'none';
+      document.body.classList.add('loaded');
     }
 
-    // Hard refresh function
+    // Optimized hard refresh function
     function hardRefresh() {
+      document.body.classList.remove('loaded');
       const iframe = document.getElementById('contentFrame');
-      document.getElementById('loader').style.display = 'flex';
       // Add timestamp to force fresh load
-      const timestamp = new Date().getTime();
-      iframe.src = iframe.src.split('?')[0] + '?t=' + timestamp;
+      iframe.src = iframeUrl + '?t=' + Date.now();
     }
 
     // Refresh every 3000 seconds (adjust time as needed)
-    setInterval(hardRefresh, 3000000);
+    const refreshInterval = setInterval(hardRefresh, 3000000);
 
-    // Show loader initially
-    document.getElementById('loader').style.display = 'flex';
+    // If the iframe takes too long to load, show an error
+    const loadTimeout = setTimeout(() => {
+      if (!document.body.classList.contains('loaded')) {
+        document.querySelector('.loader').innerHTML = 
+          '<p>Loading is taking longer than expected. Please check your connection.</p>';
+      }
+    }, 10000); // 10 seconds timeout
   </script>
 </body>
 </html>
