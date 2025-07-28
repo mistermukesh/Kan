@@ -6,7 +6,6 @@
   <title>Zoho Sales Order Slip</title>
   <link rel="icon" type="image/png" href="https://kanuniversal.info/Favicon.png" />
   
-  <!-- Inline critical CSS -->
   <style>
     html, body {
       margin: 0;
@@ -20,7 +19,7 @@
       border: none;
       width: 100vw;
       height: 100vh;
-      visibility: hidden; /* Hide until loaded */
+      visibility: hidden;
     }
 
     .loader {
@@ -31,9 +30,11 @@
       height: 100%;
       background: white;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       z-index: 9999;
+      font-family: Arial, sans-serif;
     }
     
     .spinner {
@@ -43,11 +44,18 @@
       border-top: 4px solid #3498db;
       border-radius: 50%;
       animation: spin 1s linear infinite;
+      margin-bottom: 15px;
     }
     
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+    
+    .status-message {
+      color: #555;
+      font-size: 14px;
+      margin-top: 10px;
     }
     
     .loaded iframe {
@@ -61,49 +69,58 @@
 <body>
   <div class="loader">
     <div class="spinner"></div>
+    <div class="status-message">Loading your sales order slip...</div>
   </div>
 
   <iframe
     id="contentFrame"
     src="https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxKcSA_TkEi9-mALJHHZS7tY_yP_XrD8xdpdEh9BQZSz1LZWchgXvmzRikPVx0EIDrg/exec"
     allowfullscreen
-    loading="eager" <!-- Changed from lazy to eager -->
+    loading="eager"
     onload="hideLoader()">
   </iframe>
 
   <script>
-    // Preload the iframe URL
-    const iframeUrl = "https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxKcSA_TkEi9-mALJHHZS7tY_yP_XrD8xdpdEh9BQZSz1LZWchgXvmzRikPVx0EIDrg/exec";
-    
-    // Create link preload element
-    const link = document.createElement('link');
-    link.rel = 'preconnect';
-    link.href = 'https://script.google.com';
-    document.head.appendChild(link);
-    
+    // Update status message
+    function updateStatus(message) {
+      document.querySelector('.status-message').textContent = message;
+    }
+
     // Hide loader when iframe content is loaded
     function hideLoader() {
       document.body.classList.add('loaded');
+      clearTimeout(loadTimeout);
     }
 
-    // Optimized hard refresh function
+    // Hard refresh function
     function hardRefresh() {
       document.body.classList.remove('loaded');
+      updateStatus('Refreshing data...');
       const iframe = document.getElementById('contentFrame');
-      // Add timestamp to force fresh load
-      iframe.src = iframeUrl + '?t=' + Date.now();
+      iframe.src = iframe.src.split('?')[0] + '?t=' + Date.now();
+      
+      // Set new timeout for this refresh
+      clearTimeout(loadTimeout);
+      loadTimeout = setTimeout(showLoadingError, 15000); // 15 seconds timeout
     }
 
-    // Refresh every 3000 seconds (adjust time as needed)
+    function showLoadingError() {
+      if (!document.body.classList.contains('loaded')) {
+        updateStatus('Still loading... The server might be slow. Please wait or try again later.');
+      }
+    }
+
+    // Initial timeout (more generous - 15 seconds)
+    let loadTimeout = setTimeout(showLoadingError, 15000);
+
+    // Refresh every 3000 seconds (50 minutes)
     const refreshInterval = setInterval(hardRefresh, 3000000);
 
-    // If the iframe takes too long to load, show an error
-    const loadTimeout = setTimeout(() => {
-      if (!document.body.classList.contains('loaded')) {
-        document.querySelector('.loader').innerHTML = 
-          '<p>Loading is taking longer than expected. Please check your connection.</p>';
-      }
-    }, 10000); // 10 seconds timeout
+    // Preconnect to Google domains to speed up connection
+    const preconnect = document.createElement('link');
+    preconnect.rel = 'preconnect';
+    preconnect.href = 'https://script.google.com';
+    document.head.appendChild(preconnect);
   </script>
 </body>
 </html>
