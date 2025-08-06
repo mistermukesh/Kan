@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Location Verification</title>
+  <title>Location Verification Required</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #3498db;
       --success: #2ecc71;
       --error: #e74c3c;
+      --warning: #f39c12;
     }
     
     body {
@@ -35,29 +36,13 @@
       position: relative;
       overflow: hidden;
       z-index: 1;
+      animation: pulse 2s infinite;
     }
     
-    .container::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: conic-gradient(
-        transparent, transparent, transparent, var(--primary)
-      );
-      animation: rotate 4s linear infinite;
-      z-index: -2;
-    }
-    
-    .container::after {
-      content: '';
-      position: absolute;
-      inset: 3px;
-      background: white;
-      border-radius: 18px;
-      z-index: -1;
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
+      50% { transform: scale(1.01); }
+      100% { transform: scale(1); box-shadow: 0 0 0 15px rgba(52, 152, 219, 0); }
     }
     
     h1 {
@@ -73,55 +58,39 @@
       font-weight: 300;
     }
     
-    .orbital-spinner {
+    .spinner-container {
       position: relative;
       height: 150px;
       width: 150px;
       margin: 30px auto;
     }
     
-    .orbital-spinner::before {
-      content: '';
+    .spinner {
       position: absolute;
       top: 50%;
       left: 50%;
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 4px solid transparent;
+      border: 8px solid transparent;
       border-top-color: var(--primary);
       border-bottom-color: var(--primary);
       animation: spin 1.5s linear infinite;
       transform: translate(-50%, -50%) rotate(0);
-      box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
     }
     
-    .orbital-spinner::after {
-      content: '';
+    .spinner-inner {
       position: absolute;
       top: 50%;
       left: 50%;
       width: 70%;
       height: 70%;
       border-radius: 50%;
-      border: 4px solid transparent;
+      border: 6px solid transparent;
       border-left-color: var(--primary);
       border-right-color: var(--primary);
       animation: spinReverse 2s linear infinite;
       transform: translate(-50%, -50%) rotate(0);
-    }
-    
-    .satellite {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      width: 20px;
-      height: 20px;
-      background: var(--primary);
-      border-radius: 50%;
-      transform-origin: 50% 65px;
-      animation: orbit 3s linear infinite;
-      box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
     }
     
     .status-message {
@@ -148,6 +117,11 @@
       z-index: -1;
     }
     
+    .info {
+      color: var(--primary);
+      opacity: 1;
+    }
+    
     .success {
       color: var(--success);
       opacity: 1;
@@ -155,6 +129,11 @@
     
     .error {
       color: var(--error);
+      opacity: 1;
+    }
+    
+    .warning {
+      color: var(--warning);
       opacity: 1;
     }
     
@@ -168,164 +147,165 @@
       100% { transform: translate(-50%, -50%) rotate(-360deg); }
     }
     
-    @keyframes orbit {
-      0% { transform: rotate(0deg) translateX(65px) rotate(0deg); }
-      100% { transform: rotate(360deg) translateX(65px) rotate(-360deg); }
-    }
-    
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    .progress-bar {
-      height: 4px;
-      background: rgba(52, 152, 219, 0.2);
-      border-radius: 2px;
+    .btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 16px;
+      cursor: pointer;
       margin-top: 20px;
-      overflow: hidden;
+      transition: all 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: none;
     }
     
-    .progress {
-      height: 100%;
-      width: 0%;
-      background: var(--primary);
-      border-radius: 2px;
-      transition: width 0.3s ease;
+    .btn:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn-warning {
+      background-color: var(--warning);
+    }
+    
+    .btn-warning:hover {
+      background-color: #e67e22;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Verifying Your Location</h1>
-    <p>Please wait while we capture your installation coordinates...</p>
+    <h1>Location Verification Required</h1>
+    <p>We need to verify your installation location to proceed</p>
     
-    <div class="orbital-spinner">
-      <div class="satellite"></div>
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <div class="spinner-inner"></div>
     </div>
     
-    <div id="status" class="status-message"></div>
-    <div class="progress-bar">
-      <div id="progress" class="progress"></div>
-    </div>
+    <div id="status" class="status-message info">Requesting location access...</div>
+    
+    <button id="retryBtn" class="btn btn-warning">Allow Location Access</button>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const statusElement = document.getElementById('status');
-      const progressElement = document.getElementById('progress');
-      const redirectUrl = 'https://forms.gle/1RCb9k7pphSPzY7j6';
-      const scriptUrl = 'https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxT1e03Z8E-mON3ciLBZRZg1KmOXS5vR2AAC45gUFfp-KbiWTll8wlgyCfrEuKrzSZsEg/exec';
-      
-      // Start the process immediately
+    const statusElement = document.getElementById('status');
+    const retryBtn = document.getElementById('retryBtn');
+    const redirectUrl = 'https://forms.gle/1RCb9k7pphSPzY7j6';
+    const scriptUrl = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    // Start the process immediately
+    document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         captureLocation();
       }, 1000);
       
-      function captureLocation() {
-        updateStatus("Initializing location services...");
-        updateProgress(10);
-        
-        if (!navigator.geolocation) {
-          showError("Geolocation not supported by your browser");
-          redirectAfterDelay();
-          return;
-        }
-        
-        updateStatus("Requesting location access...");
-        updateProgress(30);
-        
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            updateStatus("Location acquired! Saving data...");
-            updateProgress(60);
-            
-            try {
-              const response = await saveLocation(
-                position.coords.latitude, 
-                position.coords.longitude
-              );
-              
-              if (response.status === "success") {
-                updateStatus("✓ Location verified successfully!");
-                updateProgress(100);
-                setTimeout(() => {
-                  window.location.href = redirectUrl;
-                }, 1000);
-              } else {
-                throw new Error(response.message || "Failed to save location");
-              }
-            } catch (error) {
-              showError(`⚠ ${error.message}`);
-              redirectAfterDelay();
-            }
-          },
-          (error) => {
-            let message = "Couldn't verify location: ";
-            switch(error.code) {
-              case error.PERMISSION_DENIED:
-                message += "Permission denied";
-                break;
-              case error.POSITION_UNAVAILABLE:
-                message += "Location unavailable";
-                break;
-              case error.TIMEOUT:
-                message += "Request timed out";
-                break;
-              default:
-                message += "Unknown error";
-            }
-            showError(`⚠ ${message}`);
-            redirectAfterDelay();
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          }
-        );
-      }
-      
-      function redirectAfterDelay() {
-        updateProgress(100);
-        setTimeout(() => {
-          window.location.href = redirectUrl;
-        }, 2000);
-      }
-      
-      function updateStatus(message) {
-        statusElement.textContent = message;
-        statusElement.style.opacity = '1';
-        statusElement.style.transform = 'translateY(0)';
-      }
-      
-      function showError(message) {
-        statusElement.textContent = message;
-        statusElement.className = 'status-message error';
-        statusElement.style.opacity = '1';
-        statusElement.style.transform = 'translateY(0)';
-      }
-      
-      function updateProgress(percent) {
-        progressElement.style.width = `${percent}%`;
-      }
-      
-      async function saveLocation(lat, lng) {
-        const formData = new URLSearchParams();
-        formData.append('latitude', lat);
-        formData.append('longitude', lng);
-        
-        const response = await fetch(scriptUrl, {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        });
-        
-        return await response.json();
-      }
+      retryBtn.addEventListener('click', () => {
+        retryBtn.style.display = 'none';
+        updateStatus("Requesting location access again...", "info");
+        captureLocation();
+      });
     });
+    
+    function captureLocation() {
+      if (!navigator.geolocation) {
+        updateStatus("Geolocation is not supported by your browser", "error");
+        return;
+      }
+      
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          updateStatus("Location acquired! Verifying...", "info");
+          
+          try {
+            const response = await saveLocation(
+              position.coords.latitude, 
+              position.coords.longitude
+            );
+            
+            if (response.status === "success") {
+              updateStatus("✓ Location verified successfully! Redirecting...", "success");
+              setTimeout(() => {
+                window.location.href = redirectUrl;
+              }, 1500);
+            } else {
+              throw new Error(response.message || "Failed to save location");
+            }
+          } catch (error) {
+            updateStatus(`⚠ ${error.message}`, "error");
+            showRetryButton();
+          }
+        },
+        (error) => {
+          retryCount++;
+          let message = "Location access is required: ";
+          
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              message = "You denied location permission. Please allow to continue.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              message = "Location unavailable. Please try again.";
+              break;
+            case error.TIMEOUT:
+              message = "Request timed out. Please try again.";
+              break;
+            default:
+              message = "We need your location to continue.";
+          }
+          
+          updateStatus(`⚠ ${message}`, "warning");
+          
+          if (retryCount < maxRetries) {
+            // Auto-retry after delay
+            setTimeout(() => {
+              updateStatus(`Attempting again... (${retryCount}/${maxRetries})`, "info");
+              captureLocation();
+            }, 2000);
+          } else {
+            showRetryButton();
+          }
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 0
+        }
+      );
+    }
+    
+    function updateStatus(message, type) {
+      statusElement.textContent = message;
+      statusElement.className = `status-message ${type}`;
+      statusElement.style.opacity = '1';
+      statusElement.style.transform = 'translateY(0)';
+    }
+    
+    function showRetryButton() {
+      retryBtn.style.display = 'inline-block';
+      retryBtn.focus();
+    }
+    
+    async function saveLocation(lat, lng) {
+      const formData = new URLSearchParams();
+      formData.append('latitude', lat);
+      formData.append('longitude', lng);
+      
+      const response = await fetch(scriptUrl, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+      
+      return await response.json();
+    }
   </script>
 </body>
 </html>
