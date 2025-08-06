@@ -1,129 +1,331 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Verification</title>
-    <style>
-        /* [Keep all your existing CSS styles] */
-        /* ... */
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Verification</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #3498db;
+      --success: #2ecc71;
+      --error: #e74c3c;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      overflow: hidden;
+    }
+    
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+      padding: 40px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(
+        transparent, transparent, transparent, var(--primary)
+      );
+      animation: rotate 4s linear infinite;
+      z-index: -2;
+    }
+    
+    .container::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      background: white;
+      border-radius: 18px;
+      z-index: -1;
+    }
+    
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    
+    p {
+      color: #7f8c8d;
+      margin-bottom: 30px;
+      font-weight: 300;
+    }
+    
+    .orbital-spinner {
+      position: relative;
+      height: 150px;
+      width: 150px;
+      margin: 30px auto;
+    }
+    
+    .orbital-spinner::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid transparent;
+      border-top-color: var(--primary);
+      border-bottom-color: var(--primary);
+      animation: spin 1.5s linear infinite;
+      transform: translate(-50%, -50%) rotate(0);
+      box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
+    }
+    
+    .orbital-spinner::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 70%;
+      height: 70%;
+      border-radius: 50%;
+      border: 4px solid transparent;
+      border-left-color: var(--primary);
+      border-right-color: var(--primary);
+      animation: spinReverse 2s linear infinite;
+      transform: translate(-50%, -50%) rotate(0);
+    }
+    
+    .satellite {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: 50%;
+      transform-origin: 50% 65px;
+      animation: orbit 3s linear infinite;
+      box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
+    }
+    
+    .status-message {
+      margin: 25px 0;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .status-message::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: currentColor;
+      opacity: 0.1;
+      z-index: -1;
+    }
+    
+    .success {
+      color: var(--success);
+      opacity: 1;
+    }
+    
+    .error {
+      color: var(--error);
+      opacity: 1;
+    }
+    
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    
+    @keyframes spinReverse {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(-360deg); }
+    }
+    
+    @keyframes orbit {
+      0% { transform: rotate(0deg) translateX(65px) rotate(0deg); }
+      100% { transform: rotate(360deg) translateX(65px) rotate(-360deg); }
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .progress-bar {
+      height: 4px;
+      background: rgba(52, 152, 219, 0.2);
+      border-radius: 2px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+    
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Location Verification</h1>
-        <p>We need to verify your installation location</p>
-        
-        <div class="spinner-container" id="spinnerContainer">
-            <div class="spinner"></div>
-            <div class="spinner-inner"></div>
-        </div>
-        
-        <div id="status" class="status-message"></div>
-        
-        <button id="verifyBtn" class="btn">Verify Location</button>
-        <button id="continueBtn" class="btn" style="display: none; background-color: #2ecc71;">Continue to Form</button>
+  <div class="container">
+    <h1>Verifying Your Location</h1>
+    <p>Please wait while we capture your installation coordinates...</p>
+    
+    <div class="orbital-spinner">
+      <div class="satellite"></div>
     </div>
+    
+    <div id="status" class="status-message"></div>
+    <div class="progress-bar">
+      <div id="progress" class="progress"></div>
+    </div>
+  </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const statusElement = document.getElementById('status');
-            const verifyBtn = document.getElementById('verifyBtn');
-            const continueBtn = document.getElementById('continueBtn');
-            const spinnerContainer = document.getElementById('spinnerContainer');
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const statusElement = document.getElementById('status');
+      const progressElement = document.getElementById('progress');
+      const redirectUrl = 'https://forms.gle/1RCb9k7pphSPzY7j6';
+      const scriptUrl = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+      
+      // Start the process immediately
+      setTimeout(() => {
+        captureLocation();
+      }, 1000);
+      
+      function captureLocation() {
+        updateStatus("Initializing location services...");
+        updateProgress(10);
+        
+        if (!navigator.geolocation) {
+          showError("Geolocation not supported by your browser");
+          redirectAfterDelay();
+          return;
+        }
+        
+        updateStatus("Requesting location access...");
+        updateProgress(30);
+        
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            updateStatus("Location acquired! Saving data...");
+            updateProgress(60);
             
-            // Google Apps Script Web App URL
-            const scriptUrl = 'https://script.google.com/a/macros/kanuniversal.com/s/AKfycbxT1e03Z8E-mON3ciLBZRZg1KmOXS5vR2AAC45gUFfp-KbiWTll8wlgyCfrEuKrzSZsEg/exec';
-            
-            // Final redirect URL
-            const formUrl = 'https://forms.gle/1RCb9k7pphSPzY7j6';
-            
-            verifyBtn.addEventListener('click', function() {
-                // Show spinner
-                spinnerContainer.style.display = 'block';
-                verifyBtn.style.display = 'none';
-                statusElement.textContent = '';
-                
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        async function(position) {
-                            try {
-                                // Send data to Google Apps Script
-                                const response = await sendLocationToGoogleScript(
-                                    position.coords.latitude, 
-                                    position.coords.longitude
-                                );
-                                
-                                if (response.status === "success") {
-                                    showStatus("✓ Location verified successfully!", "success");
-                                    continueBtn.style.display = 'block';
-                                    spinnerContainer.style.display = 'none';
-                                } else {
-                                    throw new Error(response.message);
-                                }
-                            } catch (error) {
-                                showStatus("⚠ " + error.message, "error");
-                                continueBtn.style.display = 'block';
-                                spinnerContainer.style.display = 'none';
-                            }
-                        },
-                        function(error) {
-                            let errorMessage = "Couldn't verify location: ";
-                            switch(error.code) {
-                                case error.PERMISSION_DENIED:
-                                    errorMessage += "Permission was denied.";
-                                    break;
-                                case error.POSITION_UNAVAILABLE:
-                                    errorMessage += "Location unavailable.";
-                                    break;
-                                case error.TIMEOUT:
-                                    errorMessage += "Request timed out.";
-                                    break;
-                                default:
-                                    errorMessage += "Unknown error occurred.";
-                            }
-                            showStatus("⚠ " + errorMessage, "error");
-                            continueBtn.style.display = 'block';
-                            spinnerContainer.style.display = 'none';
-                        },
-                        {
-                            enableHighAccuracy: true,
-                            timeout: 8000,
-                            maximumAge: 0
-                        }
-                    );
-                } else {
-                    showStatus("⚠ Browser doesn't support location services", "error");
-                    continueBtn.style.display = 'block';
-                    spinnerContainer.style.display = 'none';
-                }
-            });
-            
-            continueBtn.addEventListener('click', function() {
-                window.location.href = formUrl;
-            });
-            
-            function showStatus(message, type) {
-                statusElement.textContent = message;
-                statusElement.className = 'status-message ' + type;
-                statusElement.style.opacity = '1';
-                statusElement.style.transform = 'translateY(0)';
+            try {
+              const response = await saveLocation(
+                position.coords.latitude, 
+                position.coords.longitude
+              );
+              
+              if (response.status === "success") {
+                updateStatus("✓ Location verified successfully!");
+                updateProgress(100);
+                setTimeout(() => {
+                  window.location.href = redirectUrl;
+                }, 1000);
+              } else {
+                throw new Error(response.message || "Failed to save location");
+              }
+            } catch (error) {
+              showError(`⚠ ${error.message}`);
+              redirectAfterDelay();
             }
-            
-            async function sendLocationToGoogleScript(lat, lng) {
-                const formData = new FormData();
-                formData.append('latitude', lat);
-                formData.append('longitude', lng);
-                
-                const response = await fetch(scriptUrl, {
-                    method: 'POST',
-                    body: formData,
-                    redirect: 'follow'
-                });
-                
-                return await response.json();
+          },
+          (error) => {
+            let message = "Couldn't verify location: ";
+            switch(error.code) {
+              case error.PERMISSION_DENIED:
+                message += "Permission denied";
+                break;
+              case error.POSITION_UNAVAILABLE:
+                message += "Location unavailable";
+                break;
+              case error.TIMEOUT:
+                message += "Request timed out";
+                break;
+              default:
+                message += "Unknown error";
             }
+            showError(`⚠ ${message}`);
+            redirectAfterDelay();
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      }
+      
+      function redirectAfterDelay() {
+        updateProgress(100);
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 2000);
+      }
+      
+      function updateStatus(message) {
+        statusElement.textContent = message;
+        statusElement.style.opacity = '1';
+        statusElement.style.transform = 'translateY(0)';
+      }
+      
+      function showError(message) {
+        statusElement.textContent = message;
+        statusElement.className = 'status-message error';
+        statusElement.style.opacity = '1';
+        statusElement.style.transform = 'translateY(0)';
+      }
+      
+      function updateProgress(percent) {
+        progressElement.style.width = `${percent}%`;
+      }
+      
+      async function saveLocation(lat, lng) {
+        const formData = new URLSearchParams();
+        formData.append('latitude', lat);
+        formData.append('longitude', lng);
+        
+        const response = await fetch(scriptUrl, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
         });
-    </script>
+        
+        return await response.json();
+      }
+    });
+  </script>
 </body>
 </html>
