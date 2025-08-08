@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kan Universal - Engineer Performance Dashboard</title>
+    <link rel="icon" type="image/png" href="https://kanuniversal.info/Favicon.png" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .company-logo {
+            height: 50px;
+            margin-right: 15px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+            background-color: white;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+        }
+        
+        .performance-high {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+        }
+        
+        .performance-medium {
+            background-color: rgba(241, 196, 15, 0.2);
+            color: #f39c12;
+        }
+        
+        .performance-low {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table thead th {
+            background-color: var(--dark-color);
+            color: white;
+            border: none;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .badge-rank {
+            font-size: 0.9em;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .rank-1 {
+            background-color: #ffd700;
+            color: #000;
+        }
+        
+        .rank-2 {
+            background-color: #c0c0c0;
+            color: #000;
+        }
+        
+        .rank-3 {
+            background-color: #cd7f32;
+            color: #000;
+        }
+        
+        .filter-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+        }
+        
+        .progress-bar {
+            border-radius: 5px;
+        }
+        
+        .highlight-card {
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .card {
+                margin-bottom: 15px;
+            }
+            
+            .dashboard-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .company-logo {
+                height: 40px;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-8 d-flex align-items-center">
+                    <img src="logo.png" alt="Kan Universal Logo" class="company-logo">
+                    <div>
+                        <h1><i class="fas fa-tachometer-alt"></i> Engineer Performance Dashboard</h1>
+                        <p class="mb-0">Kan Universal Pvt Ltd - Real-time tracking of project metrics</p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <span class="badge bg-light text-dark fs-6">Last Updated: <span id="update-time"></span></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="filter-section mb-4">
+            <div class="row">
+                <div class="col-md-3 mb-2">
+                    <label for="search-engineer" class="form-label">Search Engineer</label>
+                    <input type="text" class="form-control" id="search-engineer" placeholder="Type engineer name...">
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label for="filter-rank" class="form-label">Rank Range</label>
+                    <select class="form-select" id="filter-rank">
+                        <option value="all">All Ranks</option>
+                        <option value="1-3">Top 3</option>
+                        <option value="4-7">Middle 4-7</option>
+                        <option value="8-11">Bottom 8-11</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label for="filter-performance" class="form-label">Performance Range</label>
+                    <select class="form-select" id="filter-performance">
+                        <option value="all">All Performance</option>
+                        <option value="70-100">High (70-100%)</option>
+                        <option value="40-69">Medium (40-69%)</option>
+                        <option value="0-39">Low (0-39%)</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label for="sort-by" class="form-label">Sort By</label>
+                    <select class="form-select" id="sort-by">
+                        <option value="ranking">Ranking</option>
+                        <option value="performance" selected>Performance %</option>
+                        <option value="projects">Project Count</option>
+                        <option value="time">Average Time</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card highlight-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Top Performer</h5>
+                        <h3 class="card-text" id="top-performer">SOHEL</h3>
+                        <p class="text-success mb-1">Performance: <strong>83.26%</strong></p>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 83.26%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card highlight-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Most Projects</h5>
+                        <h3 class="card-text" id="most-projects">SOHEL</h3>
+                        <p class="text-primary mb-1">Projects: <strong>25</strong></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card highlight-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Best Efficiency</h5>
+                        <h3 class="card-text" id="best-efficiency">ALOK</h3>
+                        <p class="text-info mb-1">Avg Time: <strong>2.6 Days</strong></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card highlight-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Team Average</h5>
+                        <h3 class="card-text">Performance</h3>
+                        <p class="text-warning mb-1">Average: <strong>52.65%</strong></p>
+                        <div class="progress">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 52.65%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-table"></i> Engineer Performance Data
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="performance-table">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Engineer</th>
+                                        <th>Projects</th>
+                                        <th>Total Time</th>
+                                        <th>Avg Time</th>
+                                        <th>Performance</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body">
+                                    <!-- Data will be inserted here by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie"></i> Performance Distribution
+                    </div>
+                    <div class="card-body">
+                        <canvas id="performanceChart" height="250"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar"></i> Projects vs Average Time
+                    </div>
+                    <div class="card-body">
+                        <canvas id="projectsChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const engineerData = [
+            { name: "NITESH", projects: 22, totalTime: "128 Day", avgTime: 5.818, performance: 66.55, ranking: 3 },
+            { name: "SURYA", projects: 15, totalTime: "68 Day", avgTime: 4.533, performance: 53.65, ranking: 6 },
+            { name: "ROHIT", projects: 23, totalTime: "131 Day", avgTime: 5.696, performance: 69.25, ranking: 2 },
+            { name: "SOHEL", projects: 25, totalTime: "86 Day", avgTime: 3.440, performance: 83.26, ranking: 1 },
+            { name: "ABHISHEK", projects: 14, totalTime: "134 Day", avgTime: 9.571, performance: 41.96, ranking: 9 },
+            { name: "PRADEEP", projects: 19, totalTime: "110 Day", avgTime: 5.789, performance: 59.42, ranking: 4 },
+            { name: "ALOK", projects: 5, totalTime: "13 Day", avgTime: 2.600, performance: 42.77, ranking: 8 },
+            { name: "PRABHAT", projects: 6, totalTime: "12 Day", avgTime: 2.000, performance: 54.40, ranking: 5 },
+            { name: "VIKAS", projects: 4, totalTime: "93 Day", avgTime: 23.250, performance: 13.04, ranking: 11 },
+            { name: "Dhuno", projects: 10, totalTime: "55 Day", avgTime: 5.500, performance: 38.55, ranking: 10 },
+            { name: "NIRANJAN", projects: 11, totalTime: "38 Day", avgTime: 3.455, performance: 49.56, ranking: 7 }
+        ];
+
+        // Set current date and time
+        document.getElementById('update-time').textContent = new Date().toLocaleString();
+
+        // Function to render table
+        function renderTable(data) {
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+            
+            data.forEach(engineer => {
+                const row = document.createElement('tr');
+                
+                // Determine performance class
+                let perfClass = '';
+                if (engineer.performance >= 70) perfClass = 'performance-high';
+                else if (engineer.performance >= 40) perfClass = 'performance-medium';
+                else perfClass = 'performance-low';
+                
+                // Determine rank badge class
+                let rankClass = '';
+                if (engineer.ranking === 1) rankClass = 'rank-1';
+                else if (engineer.ranking === 2) rankClass = 'rank-2';
+                else if (engineer.ranking === 3) rankClass = 'rank-3';
+                
+                row.innerHTML = `
+                    <td><span class="badge ${rankClass} badge-rank">${engineer.ranking}</span></td>
+                    <td><strong>${engineer.name}</strong></td>
+                    <td>${engineer.projects}</td>
+                    <td>${engineer.totalTime}</td>
+                    <td>${engineer.avgTime.toFixed(3)}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span class="me-2">${engineer.performance.toFixed(2)}%</span>
+                            <div class="progress flex-grow-1" style="height: 8px;">
+                                <div class="progress-bar ${perfClass.replace('performance-', 'bg-')}" 
+                                     role="progressbar" style="width: ${engineer.performance}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="showEngineerDetails('${engineer.name}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                
+                row.classList.add(perfClass);
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to filter data
+        function filterData() {
+            const searchText = document.getElementById('search-engineer').value.toLowerCase();
+            const rankFilter = document.getElementById('filter-rank').value;
+            const performanceFilter = document.getElementById('filter-performance').value;
+            const sortBy = document.getElementById('sort-by').value;
+            
+            let filteredData = [...engineerData];
+            
+            // Apply search filter
+            if (searchText) {
+                filteredData = filteredData.filter(engineer => 
+                    engineer.name.toLowerCase().includes(searchText)
+                );
+            }
+            
+            // Apply rank filter
+            if (rankFilter !== 'all') {
+                const [minRank, maxRank] = rankFilter.split('-').map(Number);
+                filteredData = filteredData.filter(engineer => 
+                    engineer.ranking >= minRank && engineer.ranking <= maxRank
+                );
+            }
+            
+            // Apply performance filter
+            if (performanceFilter !== 'all') {
+                const [minPerf, maxPerf] = performanceFilter.split('-').map(Number);
+                filteredData = filteredData.filter(engineer => 
+                    engineer.performance >= minPerf && engineer.performance <= maxPerf
+                );
+            }
+            
+            // Apply sorting
+            switch(sortBy) {
+                case 'ranking':
+                    filteredData.sort((a, b) => a.ranking - b.ranking);
+                    break;
+                case 'performance':
+                    filteredData.sort((a, b) => b.performance - a.performance);
+                    break;
+                case 'projects':
+                    filteredData.sort((a, b) => b.projects - a.projects);
+                    break;
+                case 'time':
+                    filteredData.sort((a, b) => a.avgTime - b.avgTime);
+                    break;
+            }
+            
+            renderTable(filteredData);
+            updateCharts(filteredData);
+        }
+
+        // Function to show engineer details
+        function showEngineerDetails(name) {
+            const engineer = engineerData.find(e => e.name === name);
+            if (engineer) {
+                alert(`Engineer Details:\n\nName: ${engineer.name}\nRank: ${engineer.ranking}\nProjects: ${engineer.projects}\nTotal Time: ${engineer.totalTime}\nAvg Time: ${engineer.avgTime.toFixed(2)} days\nPerformance: ${engineer.performance.toFixed(2)}%`);
+            }
+        }
+
+        // Function to initialize charts
+        function initializeCharts() {
+            // Performance distribution chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            window.performanceChart = new Chart(performanceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['High (70-100%)', 'Medium (40-69%)', 'Low (0-39%)'],
+                    datasets: [{
+                        data: [3, 5, 3],
+                        backgroundColor: [
+                            '#2ecc71',
+                            '#f39c12',
+                            '#e74c3c'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Projects vs Average Time chart
+            const projectsCtx = document.getElementById('projectsChart').getContext('2d');
+            window.projectsChart = new Chart(projectsCtx, {
+                type: 'bar',
+                data: {
+                    labels: engineerData.map(e => e.name),
+                    datasets: [
+                        {
+                            label: 'Projects',
+                            data: engineerData.map(e => e.projects),
+                            backgroundColor: '#3498db',
+                            borderColor: '#2980b9',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Avg Time (Days)',
+                            data: engineerData.map(e => e.avgTime),
+                            backgroundColor: '#9b59b6',
+                            borderColor: '#8e44ad',
+                            borderWidth: 1,
+                            type: 'line',
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Projects'
+                            }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Avg Time (Days)'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to update charts
+        function updateCharts(data) {
+            // Update performance distribution chart
+            const highPerf = data.filter(e => e.performance >= 70).length;
+            const medPerf = data.filter(e => e.performance >= 40 && e.performance < 70).length;
+            const lowPerf = data.filter(e => e.performance < 40).length;
+            
+            window.performanceChart.data.datasets[0].data = [highPerf, medPerf, lowPerf];
+            window.performanceChart.update();
+            
+            // Update projects vs average time chart
+            window.projectsChart.data.labels = data.map(e => e.name);
+            window.projectsChart.data.datasets[0].data = data.map(e => e.projects);
+            window.projectsChart.data.datasets[1].data = data.map(e => e.avgTime);
+            window.projectsChart.update();
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTable(engineerData);
+            initializeCharts();
+            
+            // Set up event listeners for filters
+            document.getElementById('search-engineer').addEventListener('input', filterData);
+            document.getElementById('filter-rank').addEventListener('change', filterData);
+            document.getElementById('filter-performance').addEventListener('change', filterData);
+            document.getElementById('sort-by').addEventListener('change', filterData);
+            
+            // Find and display top performers
+            const topPerformer = [...engineerData].sort((a, b) => b.performance - a.performance)[0];
+            const mostProjects = [...engineerData].sort((a, b) => b.projects - a.projects)[0];
+            const bestEfficiency = [...engineerData].sort((a, b) => a.avgTime - b.avgTime)[0];
+            
+            document.getElementById('top-performer').textContent = topPerformer.name;
+            document.getElementById('most-projects').textContent = mostProjects.name;
+            document.getElementById('best-efficiency').textContent = bestEfficiency.name;
+        });
+    </script>
+    
+    <!-- Font Awesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
