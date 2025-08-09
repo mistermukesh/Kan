@@ -705,6 +705,17 @@
                 submitBtn.textContent = 'Submit Attendance';
             }
         }
+        // Example frontend call
+async function login(email, password) {
+  const response = await fetch('https://script.google.com/macros/s/AKfycbzwCCZIGgU3vNdSCphIhA7TWM4iUFIabC2xAX9W23SMTUcecXCoxK35xZ5PhWEG43Th/exec?action=login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password })
+  });
+  return await response.json();
+}
         
         function showStatusMessage(message, type) {
             statusMessage.textContent = message;
